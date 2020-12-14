@@ -23,6 +23,32 @@
             .info .title {
                 font-weight: bold;
             }
+            .custom_zoomcontrol {
+                position: absolute;
+                top: 50px;
+                right: 30px;
+                width: 36px;
+                height: 80px;
+                overflow: hidden;
+                z-index: 1;
+                background-color: #f5f5f5;
+            }
+            .custom_zoomcontrol span {
+                display: block;
+                width: 36px;
+                height: 40px;
+                text-align: center;
+                cursor: pointer;
+            }
+            .custom_zoomcontrol span img {
+                width: 15px;
+                height: 15px;
+                padding: 12px 0;
+                border: none;
+            }
+            .custom_zoomcontrol span:first-child {
+                border-bottom: 1px solid #bfbfbf;
+            }
         </style>
         <title>Sample Polygon</title>
     </head>
@@ -32,6 +58,14 @@
         <script
             type="text/javascript"
             src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2befa4c2ccbf24ac6c3bec24f23abb28"></script>
+        <div class="custom_zoomcontrol radius_border">
+            <span onclick="zoomIn()"><img
+                src="https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/ico_plus.png"
+                alt="확대"></span>
+            <span onclick="zoomOut()"><img
+                src="https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/ico_minus.png"
+                alt="축소"></span>
+        </div>
         <script>
             let map = new kakao
                 .maps
@@ -43,6 +77,9 @@
                     level: 8 // 초기 지도의 확대 레벨
                 });
             console.log("초기 확대 레벨 값은 :", map.getLevel());
+            // 지도 스크롤 액션 잠금
+            map.setZoomable(false);
+
             let customOverlay = new kakao
                 .maps
                 .CustomOverlay({}); // 읍면동 이름을 표시할 오버레이
@@ -57,10 +94,10 @@
             map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
 
             // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
-            var zoomControl = new kakao
-                .maps
-                .ZoomControl();
-            map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+            // var zoomControl = new kakao
+            //     .maps
+            //     .ZoomControl();
+            // map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 
             // 서울 읍면동 데이터 파일을 입력 받아 폴리곤 렌더링
             $.getJSON(
@@ -207,8 +244,8 @@
 
                     // 확대 레벨 값이 5 이상인 경우 폴리곤 재생성
                     if (level >= 5) {
-                        // console.log('check_polygons : ', check_polygons);
-                        // console.log('check_markers : ', check_markers);
+                        // console.log('check_polygons : ', check_polygons); console.log('check_markers
+                        // : ', check_markers);
                         if (check_polygons == false) {
                             for (let index = 0; index < polygons.length; index++) {
                                 polygons[index].setMap(map);
@@ -224,8 +261,8 @@
                     }
                     // 확대 레벨 값이 4 이하인 경우 폴리곤 제거 및 해당 동 관련 마커 생성
                     if (level <= 4) {
-                        // console.log('check_polygons : ', check_polygons);
-                        // console.log('check_markers : ', check_markers);
+                        // console.log('check_polygons : ', check_polygons); console.log('check_markers
+                        // : ', check_markers);
                         if (check_polygons == true) {
                             for (let index = 0; index < polygons.length; index++) {
                                 polygons[index].setMap(null);
@@ -288,6 +325,16 @@
                 return function () {
                     infowindow.close();
                 };
+            }
+
+            // 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
+            function zoomIn() {
+                map.setLevel(map.getLevel() - 2);
+            }
+
+            // 지도 확대, 축소 컨트롤에서 축소 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
+            function zoomOut() {
+                map.setLevel(map.getLevel() + 2);
             }
         </script>
     </body>

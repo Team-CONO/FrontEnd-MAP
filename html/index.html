@@ -15,12 +15,6 @@
                 top: -5px;
                 left: 15px;
                 padding: 2px;
-            }
-            .info {
-                font-size: 12px;
-                padding: 5px;
-            }
-            .info .title {
                 font-weight: bold;
             }
             .custom_zoomcontrol {
@@ -81,9 +75,25 @@
                         .LatLng(37.5642135, 127.0016985), // 초기 지도의 중심좌표
                     level: 8 // 초기 지도의 확대 레벨
                 });
-            console.log("초기 확대 레벨 값은 :", map.getLevel());
+            console.log("초기 지도 줌 레벨 값은 :", map.getLevel());
             // 지도 스크롤 액션 잠금
             map.setZoomable(false);
+
+            // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+            var mapTypeControl = new kakao
+                .maps
+                .MapTypeControl();
+            // 지도에 컨트롤을 추가해야 지도위에 표시됩니다 kakao.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데
+            // TOPRIGHT는 오른쪽 위를 의미합니다
+            map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+            // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다 var zoomControl = new kakao     .maps
+            // .ZoomControl(); map.addControl(zoomControl,
+            // kakao.maps.ControlPosition.RIGHT);
+
+            let customOverlay = new kakao
+                .maps
+                .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
 
             // 초기엔 시군구로 폴리곤 렌더링
             $.getJSON("../json/seoul_SIG.geojson", function (params) {
@@ -98,22 +108,7 @@
                 });
             });
 
-            let customOverlay = new kakao
-                .maps
-                .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
-
-            // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
-            var mapTypeControl = new kakao
-                .maps
-                .MapTypeControl();
-
-            // 지도에 컨트롤을 추가해야 지도위에 표시됩니다 kakao.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데
-            // TOPRIGHT는 오른쪽 위를 의미합니다
-            map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
-
-            // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다 var zoomControl = new kakao     .maps
-            // .ZoomControl(); map.addControl(zoomControl,
-            // kakao.maps.ControlPosition.RIGHT); 지도에 줌 이벤트가 발생하였을 때
+            // 지도에 줌 이벤트가 발생하였을 때
             let markers = [];
             kakao
                 .maps
@@ -121,9 +116,9 @@
                 .addListener(map, 'zoom_changed', function () {
                     // 지도의 현재 레벨을 얻어옵니다
                     var level = map.getLevel();
-                    console.log("현재 확대 레벨 값은 :", level);
+                    console.log("현재 지도 줌 레벨 값은 :", level);
 
-                    // 시군구 데이터 파일을 입력 받아 폴리곤 렌더링
+                    // 레벨이 8 이상인경우 시군구 데이터 파일을 입력 받아 폴리곤 렌더링
                     if (level >= 8) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
@@ -140,7 +135,7 @@
                             });
                         });
                     }
-                    // 읍면동 데이터 파일을 입력 받아 폴리곤 렌더링
+                    // 레벨이 6이면 읍면동 데이터 파일을 입력 받아 폴리곤 렌더링
                     if (level == 6) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
@@ -160,7 +155,7 @@
                             });
                         });
                     }
-                    // 거리 단위로 지도 줌 레벨 값이 되었을 경우 해당 지역 마커 렌더링
+                    // 레벨이 4이면 거리 단위 이므로 해당 지역 관련 마커 렌더링
                     if (level == 4) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
@@ -204,8 +199,30 @@
                     }
                 });
 
-            let polygons = []; // 확대 시 폴리곤 제거를 위한 배열
+            // 인포윈도우를 표시하는 클로저를 만드는 함수입니다
+            function makeOverListener(map, marker, infowindow) {
+                return function () {
+                    infowindow.open(map, marker);
+                };
+            }
+            // 인포윈도우를 닫는 클로저를 만드는 함수입니다
+            function makeOutListener(infowindow) {
+                return function () {
+                    infowindow.close();
+                };
+            }
 
+            // 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
+            function zoomIn() {
+                map.setLevel(map.getLevel() - 2);
+            }
+            // 지도 확대, 축소 컨트롤에서 축소 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
+            function zoomOut() {
+                map.setLevel(map.getLevel() + 2);
+            }
+
+            let polygons = []; // 확대 시 폴리곤 제거를 위한 배열
+            // 폴리곤 렌더링 함수
             function display(coordinates, name, code) {
                 let path = [];
                 let points = [];
@@ -327,28 +344,6 @@
                     // polygons = [];
                 }
             };
-
-            // 인포윈도우를 표시하는 클로저를 만드는 함수입니다
-            function makeOverListener(map, marker, infowindow) {
-                return function () {
-                    infowindow.open(map, marker);
-                };
-            }
-            // 인포윈도우를 닫는 클로저를 만드는 함수입니다
-            function makeOutListener(infowindow) {
-                return function () {
-                    infowindow.close();
-                };
-            }
-
-            // 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
-            function zoomIn() {
-                map.setLevel(map.getLevel() - 2);
-            }
-            // 지도 확대, 축소 컨트롤에서 축소 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
-            function zoomOut() {
-                map.setLevel(map.getLevel() + 2);
-            }
         </script>
     </body>
 </html>

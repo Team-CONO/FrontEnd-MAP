@@ -73,7 +73,7 @@
                     center: new kakao
                         .maps
                         .LatLng(37.5642135, 127.0016985), // 초기 지도의 중심좌표
-                    level: 8 // 초기 지도의 확대 레벨
+                    level: 12 // 초기 지도의 확대 레벨
                 });
             console.log("초기 지도 줌 레벨 값은 :", map.getLevel());
             // 지도 스크롤 액션 잠금
@@ -95,18 +95,22 @@
                 .maps
                 .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
 
-            // 초기엔 시군구로 폴리곤 렌더링
-            $.getJSON("../json/seoul_SIG.geojson", function (params) {
-                let data = params.features;
-                let coordinates = [];
-                let name = '';
-                $.each(data, function (index, val) {
-                    coordinates = val.geometry.coordinates;
-                    name = val.properties.SIG_KOR_NM;
-                    // console.log(coordinates, name);
-                    display(coordinates, name, "SIG");
+            // 초기엔 시도로 폴리곤 렌더링
+            $
+                .ajax(
+                    {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/CTPRVN.json", method: "GET", dataType: "json"}
+                )
+                .done(function (params) {
+                    let data = params.features;
+                    let coordinates = [];
+                    let name = '';
+                    $.each(data, function (index, val) {
+                        coordinates = val.geometry.coordinates;
+                        name = val.properties.CTP_KOR_NM;
+                        // console.log(coordinates, name);
+                        display(coordinates, name, "CTPRVN");
+                    });
                 });
-            });
 
             // 지도에 줌 이벤트가 발생하였을 때
             let markers = [];
@@ -118,88 +122,122 @@
                     var level = map.getLevel();
                     console.log("현재 지도 줌 레벨 값은 :", level);
 
-                    // 레벨이 8 이상인경우 시군구 데이터 파일을 입력 받아 폴리곤 렌더링
-                    if (level >= 8) {
+                    // 레벨이 12이상 인경우 경우 시군구로 폴리곤 렌더링
+                    if (level >= 12) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
                         }
-                        $.getJSON("../json/seoul_SIG.geojson", function (params) {
-                            let data = params.features;
-                            let coordinates = [];
-                            let name = '';
-                            $.each(data, function (index, val) {
-                                coordinates = val.geometry.coordinates;
-                                name = val.properties.SIG_KOR_NM;
-                                // console.log(coordinates, name);
-                                display(coordinates, name, "SIG");
+                        $
+                            .ajax(
+                                {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/CTPRVN.json", method: "GET", dataType: "json"}
+                            )
+                            .done(function (params) {
+                                let data = params.features;
+                                let coordinates = [];
+                                let name = '';
+                                $.each(data, function (index, val) {
+                                    coordinates = val.geometry.coordinates;
+                                    name = val.properties.CTP_KOR_NM;
+                                    // console.log(coordinates, name);
+                                    display(coordinates, name, "CTPRVN");
+                                });
                             });
-                        });
                     }
-                    // 레벨이 6이면 읍면동 데이터 파일을 입력 받아 폴리곤 렌더링
+                    // 레벨이 10 인경우 경우 시군구로 폴리곤 렌더링
+                    if (level == 10) {
+                        for (let index = 0; index < polygons.length; index++) {
+                            polygons[index].setMap(null);
+                        }
+                        $
+                            .ajax(
+                                {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/SIG.json", method: "GET", dataType: "json"}
+                            )
+                            .done(function (params) {
+                                let data = params.features;
+                                let coordinates = [];
+                                let name = '';
+                                $.each(data, function (index, val) {
+                                    coordinates = val.geometry.coordinates;
+                                    name = val.properties.SIG_KOR_NM;
+                                    // console.log(coordinates, name);
+                                    display(coordinates, name, "SIG");
+                                });
+                            });
+                    }
+                    // 레벨이 6 인경우 읍면동으로 폴리곤 렌더링
                     if (level == 6) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
                         }
-                        for (var index = 0; index < markers.length; index++) {
+                        for (let index = 0; index < markers.length; index++) {
                             markers[index].setMap(null);
                         }
-                        $.getJSON("../json/seoul_EMD.geojson", function (params) {
-                            let data = params.features;
-                            let coordinates = [];
-                            let name = '';
-                            $.each(data, function (index, val) {
-                                coordinates = val.geometry.coordinates;
-                                name = val.properties.emd_kor_nm;
-                                // console.log(coordinates, name);
-                                display(coordinates, name, "EMD");
+                        $
+                            .ajax(
+                                {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/EMD.json", method: "GET", dataType: "json"}
+                            )
+                            .done(function (params) {
+                                let data = params.features;
+                                let coordinates = [];
+                                let name = '';
+                                $.each(data, function (index, val) {
+                                    coordinates = val.geometry.coordinates;
+                                    name = val.properties.EMD_KOR_NM;
+                                    // console.log(coordinates, name);
+                                    display(coordinates, name, "EMD");
+                                });
                             });
-                        });
                     }
                     // 레벨이 4이면 거리 단위 이므로 해당 지역 관련 마커 렌더링
                     if (level == 4) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
                         }
-                        $.getJSON("../json/starbucks-edited.json", function (data) {
-                            markers = $(data).map(function (i, value) {
-                                return new kakao
-                                    .maps
-                                    .Marker({
-                                        position: new kakao
-                                            .maps
-                                            .LatLng(value.lat, value.lot)
-                                    });
+                        $
+                            .ajax({
+                                url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/starbucks-e" +
+                                        "dited.json",
+                                method: "GET",
+                                dataType: "json"
+                            })
+                            .done(function (data) {
+                                markers = $(data).map(function (i, value) {
+                                    return new kakao
+                                        .maps
+                                        .Marker({
+                                            position: new kakao
+                                                .maps
+                                                .LatLng(value.lat, value.lot)
+                                        });
+                                });
+                                for (var index = 0; index < markers.length; index++) {
+                                    markers[index].setMap(map);
+                                    //마커에 표시할 인포윈도우를 생성합니다
+                                    var infowindow = new kakao
+                                        .maps
+                                        .InfoWindow({
+                                            content: "스타벅스 " + data[index].s_name // 인포윈도우에 표시할 내용
+                                        });
+                                    // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다 이벤트 리스너로는 클로저를 만들어 등록합니다 for문에서 클로저를
+                                    // 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+                                    kakao
+                                        .maps
+                                        .event
+                                        .addListener(
+                                            markers[index],
+                                            'mouseover',
+                                            makeOverListener(map, markers[index], infowindow)
+                                        );
+                                    kakao
+                                        .maps
+                                        .event
+                                        .addListener(markers[index], 'mouseout', makeOutListener(infowindow));
+                                    kakao
+                                        .maps
+                                        .event
+                                        .addListener(markers[index], 'click', makeClickListener(data[index].s_name));
+                                }
                             });
-                            for (var index = 0; index < markers.length; index++) {
-                                markers[index].setMap(map);
-
-                                //마커에 표시할 인포윈도우를 생성합니다
-                                var infowindow = new kakao
-                                    .maps
-                                    .InfoWindow({
-                                        content: "스타벅스 " + data[index].s_name // 인포윈도우에 표시할 내용
-                                    });
-
-                                // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다 이벤트 리스너로는 클로저를 만들어 등록합니다 for문에서 클로저를
-                                // 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
-                                kakao
-                                    .maps
-                                    .event
-                                    .addListener(
-                                        markers[index],
-                                        'mouseover',
-                                        makeOverListener(map, markers[index], infowindow)
-                                    );
-                                kakao
-                                    .maps
-                                    .event
-                                    .addListener(markers[index], 'mouseout', makeOutListener(infowindow));
-                                kakao
-                                    .maps
-                                    .event
-                                    .addListener(markers[index], 'click', makeClickListener(data[index].s_name));
-                            }
-                        });
                     }
                 });
 
@@ -215,10 +253,10 @@
                     infowindow.close();
                 };
             }
-            // 인포윈도우 클릭 시 UI 렌더링 함수
+            // 인포윈도우 클릭하는 클로저를 만드는 함수
             function makeClickListener(title) {
-                return function() {
-                    console.log('클릭된 지점은 '+title+' 입니다.');
+                return function () {
+                    console.log('클릭된 지점은 ' + title + ' 입니다.');
                 }
             }
 
@@ -236,24 +274,43 @@
             function display(coordinates, name, code) {
                 let path = [];
                 let points = [];
+                // console.log(coordinates.length, name);
 
-                if (code == "SIG") { // 렌더링 할 폴리곤이 시군구 일 경우
-                    $.each(coordinates[0], function (index, coordinate) {
-                        let point = new Object();
-                        point.x = coordinate[1];
-                        point.y = coordinate[0];
-                        points.push(point);
-                        path.push(new kakao.maps.LatLng(coordinate[1], coordinate[0]));
+                if (code == "CTPRVN") {
+                    $.each(coordinates, function (index, coordinate) {
+                        let paths = [];
+                        $.each(coordinate, function (index, coord) {
+                            let point = new Object();
+                            point.x = coord[1];
+                            point.y = coord[0];
+                            points.push(point);
+                            paths.push(new kakao.maps.LatLng(coord[1], coord[0]));
+                        });
+                        path.push(paths);
+                    });
+                } else if (code == "SIG") { // 렌더링 할 폴리곤이 시군구 일 경우
+                    $.each(coordinates, function (index, coordinate) {
+                        let paths = [];
+                        $.each(coordinate, function (index, coord) {
+                            let point = new Object();
+                            point.x = coord[1];
+                            point.y = coord[0];
+                            points.push(point);
+                            paths.push(new kakao.maps.LatLng(coord[1], coord[0]));
+                        });
+                        path.push(paths);
                     });
                 } else if (code == "EMD") { // 렌더링 할 폴리곤이 읍면동 일 경우
-                    $.each(coordinates[0], function (index, coordinate) {
-                        for (let index = 0; index < coordinate.length; index++) {
+                    $.each(coordinates, function (index, coordinate) {
+                        let paths = [];
+                        $.each(coordinate, function (index, coord) {
                             let point = new Object();
-                            point.x = coordinate[index][1];
-                            point.y = coordinate[index][0];
+                            point.x = coord[1];
+                            point.y = coord[0];
                             points.push(point);
-                            path.push(new kakao.maps.LatLng(coordinate[index][1], coordinate[index][0]));
-                        }
+                            paths.push(new kakao.maps.LatLng(coord[1], coord[0]));
+                        });
+                        path.push(paths);
                     });
                 }
                 // 지역 하나 당 폴리곤 생성
@@ -308,13 +365,23 @@
                     .maps
                     .event
                     .addListener(polygon, 'click', function () {
-                        map.setLevel(map.getLevel() - 2, {
-                            anchor: centroid(points),
-                            animate: {
-                                duration: 350
-                            }
-                        });
-                        deletePolygon(polygons);
+                        if (map.getLevel() == 10) {
+                            map.setLevel(map.getLevel() - 4, {
+                                anchor: centroid(points),
+                                animate: {
+                                    duration: 350
+                                }
+                            });
+                            deletePolygon(polygons);
+                        } else {
+                            map.setLevel(map.getLevel() - 2, {
+                                anchor: centroid(points),
+                                animate: {
+                                    duration: 350
+                                }
+                            });
+                            deletePolygon(polygons);
+                        }
                     });
 
                 // 폴리곤 중심좌표를 구하는 centroid 알고리즘 함수

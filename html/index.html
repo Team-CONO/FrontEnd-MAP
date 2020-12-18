@@ -96,8 +96,7 @@
                 .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
 
             // 초기엔 시도로 폴리곤 렌더링
-            $
-                .ajax(
+            $.ajax(
                     {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/CTPRVN.json", method: "GET", dataType: "json"}
                 )
                 .done(function (params) {
@@ -127,8 +126,7 @@
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
                         }
-                        $
-                            .ajax(
+                        $.ajax(
                                 {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/CTPRVN.json", method: "GET", dataType: "json"}
                             )
                             .done(function (params) {
@@ -144,12 +142,11 @@
                             });
                     }
                     // 레벨이 10 인경우 경우 시군구로 폴리곤 렌더링
-                    if (level == 10) {
+                    if (level >= 8 && level <= 10) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
                         }
-                        $
-                            .ajax(
+                        $.ajax(
                                 {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/SIG.json", method: "GET", dataType: "json"}
                             )
                             .done(function (params) {
@@ -172,8 +169,7 @@
                         for (let index = 0; index < markers.length; index++) {
                             markers[index].setMap(null);
                         }
-                        $
-                            .ajax(
+                        $.ajax(
                                 {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/EMD.json", method: "GET", dataType: "json"}
                             )
                             .done(function (params) {
@@ -193,8 +189,7 @@
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
                         }
-                        $
-                            .ajax({
+                        $.ajax({
                                 url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/starbucks-e" +
                                         "dited.json",
                                 method: "GET",

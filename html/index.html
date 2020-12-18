@@ -96,7 +96,8 @@
                 .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
 
             // 초기엔 시도로 폴리곤 렌더링
-            $.ajax(
+            $
+                .ajax(
                     {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/CTPRVN.json", method: "GET", dataType: "json"}
                 )
                 .done(function (params) {
@@ -121,12 +122,13 @@
                     var level = map.getLevel();
                     console.log("현재 지도 줌 레벨 값은 :", level);
 
-                    // 레벨이 12이상 인경우 경우 시군구로 폴리곤 렌더링
-                    if (level >= 12) {
+                    // 레벨이 12 인경우 시도로 폴리곤 렌더링
+                    if (level == 12) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
                         }
-                        $.ajax(
+                        $
+                            .ajax(
                                 {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/CTPRVN.json", method: "GET", dataType: "json"}
                             )
                             .done(function (params) {
@@ -141,12 +143,13 @@
                                 });
                             });
                     }
-                    // 레벨이 10 인경우 경우 시군구로 폴리곤 렌더링
+                    // 레벨이 8이상 10이하 인경우 시군구로 폴리곤 렌더링
                     if (level >= 8 && level <= 10) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
                         }
-                        $.ajax(
+                        $
+                            .ajax(
                                 {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/SIG.json", method: "GET", dataType: "json"}
                             )
                             .done(function (params) {
@@ -169,7 +172,8 @@
                         for (let index = 0; index < markers.length; index++) {
                             markers[index].setMap(null);
                         }
-                        $.ajax(
+                        $
+                            .ajax(
                                 {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/EMD.json", method: "GET", dataType: "json"}
                             )
                             .done(function (params) {
@@ -184,12 +188,16 @@
                                 });
                             });
                     }
-                    // 레벨이 4이면 거리 단위 이므로 해당 지역 관련 마커 렌더링
+                    // 레벨이 4 인경우 거리 단위 이므로 해당 지역 관련 마커 렌더링
                     if (level == 4) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
                         }
-                        $.ajax({
+                        for (let index = 0; index < markers.length; index++) {
+                            markers[index].setMap(null);
+                        }
+                        $
+                            .ajax({
                                 url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/starbucks-e" +
                                         "dited.json",
                                 method: "GET",
@@ -261,7 +269,11 @@
             }
             // 지도 확대, 축소 컨트롤에서 축소 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
             function zoomOut() {
-                map.setLevel(map.getLevel() + 2);
+                if (map.getLevel() == 1) {
+                    map.setLevel(2);
+                } else {
+                    map.setLevel(map.getLevel() + 2);
+                }
             }
 
             let polygons = []; // 확대 시 폴리곤 제거를 위한 배열

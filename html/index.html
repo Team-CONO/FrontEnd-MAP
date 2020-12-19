@@ -283,7 +283,7 @@
                 let points = [];
                 // console.log(coordinates.length, name);
 
-                if (code == "CTPRVN") {
+                if (code == "CTPRVN") { // 렌더링 할 폴리곤이 시도 일 경우
                     $.each(coordinates, function (index, coordinate) {
                         let paths = [];
                         $.each(coordinate, function (index, coord) {
@@ -366,7 +366,7 @@
                         customOverlay.setMap(null);
                     });
 
-                // 폴리곤 클릭 시 해당 읍면동으로 확대 줌
+                // 폴리곤 클릭 시 해당 읍면동으로 확대
                 kakao
                     .maps
                     .event

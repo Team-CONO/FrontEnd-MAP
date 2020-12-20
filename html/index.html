@@ -282,45 +282,17 @@
                 let path = [];
                 let points = [];
                 // console.log(coordinates.length, name);
-
-                if (code == "CTPRVN") { // 렌더링 할 폴리곤이 시도 일 경우
-                    $.each(coordinates, function (index, coordinate) {
-                        let paths = [];
-                        $.each(coordinate, function (index, coord) {
-                            let point = new Object();
-                            point.x = coord[1];
-                            point.y = coord[0];
-                            points.push(point);
-                            paths.push(new kakao.maps.LatLng(coord[1], coord[0]));
-                        });
-                        path.push(paths);
+                $.each(coordinates, function (index, coordinate) {
+                    let paths = [];
+                    $.each(coordinate, function (index, coord) {
+                        let point = new Object();
+                        point.x = coord[1];
+                        point.y = coord[0];
+                        points.push(point);
+                        paths.push(new kakao.maps.LatLng(coord[1], coord[0]));
                     });
-                } else if (code == "SIG") { // 렌더링 할 폴리곤이 시군구 일 경우
-                    $.each(coordinates, function (index, coordinate) {
-                        let paths = [];
-                        $.each(coordinate, function (index, coord) {
-                            let point = new Object();
-                            point.x = coord[1];
-                            point.y = coord[0];
-                            points.push(point);
-                            paths.push(new kakao.maps.LatLng(coord[1], coord[0]));
-                        });
-                        path.push(paths);
-                    });
-                } else if (code == "EMD") { // 렌더링 할 폴리곤이 읍면동 일 경우
-                    $.each(coordinates, function (index, coordinate) {
-                        let paths = [];
-                        $.each(coordinate, function (index, coord) {
-                            let point = new Object();
-                            point.x = coord[1];
-                            point.y = coord[0];
-                            points.push(point);
-                            paths.push(new kakao.maps.LatLng(coord[1], coord[0]));
-                        });
-                        path.push(paths);
-                    });
-                }
-                // 지역 하나 당 폴리곤 생성
+                    path.push(paths);
+                });
                 let polygon = new kakao
                     .maps
                     .Polygon({

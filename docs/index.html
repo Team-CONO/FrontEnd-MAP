@@ -5,51 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!--jQuery 로드-->
         <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-        <style>
-            .area {
-                /* position: absolute; */
-                pointer-events: none;
-                background: #fff;
-                border: 1px solid #888;
-                border-radius: 3px;
-                font-size: 12px;
-                /* top: -5px;
-                left: 15px; */
-                padding: 2px;
-                font-weight: bold;
-            }
-            .custom_zoomcontrol {
-                position: absolute;
-                top: 50px;
-                right: 30px;
-                width: 36px;
-                height: 80px;
-                overflow: hidden;
-                z-index: 1;
-                background-color: #f5f5f5;
-            }
-            .custom_zoomcontrol span {
-                display: block;
-                width: 36px;
-                height: 40px;
-                text-align: center;
-                cursor: pointer;
-            }
-            .custom_zoomcontrol span img {
-                width: 15px;
-                height: 15px;
-                padding: 12px 0;
-                border: none;
-            }
-            .custom_zoomcontrol span:first-child {
-                border-bottom: 1px solid #bfbfbf;
-            }
-        </style>
+        <!--행정구역 관련 UI CSS 로드-->
+        <link rel="stylesheet" href="../css/info_window.css">
         <title>Korea_Polygon</title>
     </head>
     <body>
-        <div id="map" style="width:100%;height:100vh;"></div>
         <!--KAKAO-MAP 로드-->
+        <div id="map" style="width:100%;height:100vh;"></div>
         <script
             type="text/javascript"
             src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2befa4c2ccbf24ac6c3bec24f23abb28"></script>
@@ -77,7 +39,7 @@
                     level: 12 // 초기 지도의 확대 레벨
                 });
             console.log("초기 지도 줌 레벨 값은 :", map.getLevel());
-            // 지도 스크롤 액션 잠금
+            // 지도 스크롤 줌 액션 잠금
             map.setZoomable(false);
 
             // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
@@ -88,15 +50,7 @@
             // TOPRIGHT는 오른쪽 위를 의미합니다
             map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
 
-            // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다 var zoomControl = new kakao     .maps
-            // .ZoomControl(); map.addControl(zoomControl,
-            // kakao.maps.ControlPosition.RIGHT);
-
-            let customOverlay = new kakao
-                .maps
-                .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
-
-            // 초기엔 시도로 폴리곤 렌더링
+            // 초기 지도엔 시도 단위로 폴리곤 렌더링
             $
                 .ajax(
                     {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/CTPRVN.json", method: "GET", dataType: "json"}
@@ -123,7 +77,7 @@
                     var level = map.getLevel();
                     console.log("현재 지도 줌 레벨 값은 :", level);
 
-                    // 레벨이 12 인경우 시도로 폴리곤 렌더링
+                    // 레벨이 12 인경우 시도 단위로 폴리곤 렌더링
                     if (level == 12) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
@@ -144,7 +98,7 @@
                                 });
                             });
                     }
-                    // 레벨이 8이상 10이하 인경우 시군구로 폴리곤 렌더링
+                    // 레벨이 8이상 10이하 인경우 시군구 단위로 폴리곤 렌더링
                     if (level >= 8 && level <= 10) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
@@ -165,7 +119,7 @@
                                 });
                             });
                     }
-                    // 레벨이 6 인경우 읍면동으로 폴리곤 렌더링
+                    // 레벨이 6 인경우 읍면동 단위로 폴리곤 렌더링
                     if (level == 6) {
                         for (let index = 0; index < polygons.length; index++) {
                             polygons[index].setMap(null);
@@ -268,7 +222,7 @@
             function zoomIn() {
                 map.setLevel(map.getLevel() - 2);
             }
-            // 지도 확대, 축소 컨트롤에서 축소 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
+            // 지도 확대, 축소 컨트롤에서 축소 버튼을 누르면 호출되어 지도를 축소하는 함수입니다
             function zoomOut() {
                 if (map.getLevel() == 1) {
                     map.setLevel(2);
@@ -277,7 +231,7 @@
                 }
             }
 
-            let polygons = []; // 확대 시 폴리곤 제거를 위한 배열
+            let polygons = []; // 지도 줌 이벤트 시 폴리곤 제거를 위한 배열
             // 폴리곤 렌더링 함수
             function display(coordinates, name, code) {
                 let path = [];
@@ -315,51 +269,12 @@
                     .event
                     .addListener(polygon, 'mouseover', function (mouseEvent) {
                         polygon.setOptions({fillColor: '#09f'});
-
-                        customOverlay.setContent('<div class="area">' + name + '</div>');
-                        customOverlay.setPosition(centroid(points));
-                        customOverlay.setMap(map);
                     });
-
-                // 다각형에 mousemove 이벤트를 등록하고 이벤트가 발생하면 커스텀 오버레이의 위치를 변경합니다
-                // kakao
-                //     .maps
-                //     .event
-                //     .addListener(polygon, 'mousemove', function (mouseEvent) {
-                //         customOverlay.setPosition(mouseEvent.latLng);
-                //     });
-
-                // 다각형에 mouseout 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 원래색으로 변경합니다 커스텀 오버레이를 지도에서 제거합니다
                 kakao
                     .maps
                     .event
                     .addListener(polygon, 'mouseout', function () {
                         polygon.setOptions({fillColor: '#fff'});
-                        customOverlay.setMap(null);
-                    });
-
-                // 폴리곤 클릭 시 해당 읍면동으로 확대
-                kakao
-                    .maps
-                    .event
-                    .addListener(polygon, 'click', function () {
-                        if (map.getLevel() == 10) {
-                            map.setLevel(map.getLevel() - 4, {
-                                anchor: centroid(points),
-                                animate: {
-                                    duration: 350
-                                }
-                            });
-                            deletePolygon(polygons);
-                        } else {
-                            map.setLevel(map.getLevel() - 2, {
-                                anchor: centroid(points),
-                                animate: {
-                                    duration: 350
-                                }
-                            });
-                            deletePolygon(polygons);
-                        }
                     });
 
                 // 폴리곤 중심좌표를 구하는 centroid 알고리즘 함수
@@ -391,14 +306,63 @@
                         .LatLng(x / area, y / area);
                 }
 
-                // 클릭 이벤트로 지도 확대 시 전체 폴리곤 제거
+                // 클릭 이벤트로 지도 줌 이벤트 시 전체 폴리곤 제거
                 function deletePolygon(polygons) {
                     for (let index = 0; index < polygons.length; index++) {
                         polygons[index].setMap(null);
                     }
                     // polygons = [];
                 }
+
+                display_info(centroid(points), name);
             };
+
+            // 행정구역 관련 UI 렌더링 함수
+            function display_info(center, name) {
+                // console.log(center, name);
+
+                let customOverlay = new kakao
+                    .maps
+                    .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
+
+                customOverlay.setContent(
+                    '<div class="area"> <span class="text">' + name + '</span> <span class="text2"> 12,345개 </span> </div>'
+                );
+                customOverlay.setPosition(center);
+                customOverlay.setMap(map);
+
+                // UI 클릭 시 지도 줌 이벤트 활성
+                kakao
+                    .maps
+                    .event
+                    .addListener(customOverlay, 'click', function () {
+                        console.log('click!');
+                        if (map.getLevel() == 10) {
+                            map.setLevel(map.getLevel() - 4, {
+                                anchor: centroid(points),
+                                animate: {
+                                    duration: 350
+                                }
+                            });
+                            deletePolygon(polygons);
+                        } else {
+                            map.setLevel(map.getLevel() - 2, {
+                                anchor: centroid(points),
+                                animate: {
+                                    duration: 350
+                                }
+                            });
+                            deletePolygon(polygons);
+                        }
+                    });
+
+                kakao
+                    .maps
+                    .event
+                    .addListener(map, 'zoom_changed', function () {
+                        customOverlay.setMap(null);
+                    });
+            }
         </script>
     </body>
 </html>

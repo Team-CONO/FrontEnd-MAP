@@ -48,7 +48,7 @@
             let map_wheel = document.getElementById('map');
             map_wheel.addEventListener('wheel', event => {
                 var level = map.getLevel();
-                if (level == 1)
+                if (level == 1) 
                     level = 0;
                 var step = 2;
                 var sign = Math.sign(event.deltaY);
@@ -294,43 +294,6 @@
                         polygon.setOptions({fillColor: '#fff'});
                     });
 
-                // 폴리곤 중심좌표를 구하는 centroid 알고리즘 함수
-                function centroid(points) {
-                    let i,
-                        j,
-                        len,
-                        p1,
-                        p2,
-                        f,
-                        area,
-                        x,
-                        y;
-
-                    area = x = y = 0;
-
-                    for (i = 0, len = points.length, j = len - 1; i < len; j = i++) {
-                        p1 = points[i];
-                        p2 = points[j];
-
-                        f = p1.y * p2.x - p2.y * p1.x;
-                        x += (p1.x + p2.x) * f;
-                        y += (p1.y + p2.y) * f;
-                        area += f * 3;
-                    }
-
-                    return new kakao
-                        .maps
-                        .LatLng(x / area, y / area);
-                }
-
-                // 클릭 이벤트로 지도 줌 이벤트 시 전체 폴리곤 제거
-                function deletePolygon(polygons) {
-                    for (let index = 0; index < polygons.length; index++) {
-                        polygons[index].setMap(null);
-                    }
-                    // polygons = [];
-                }
-
                 display_info(centroid(points), name);
             };
 
@@ -342,36 +305,15 @@
                     .maps
                     .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
 
-                customOverlay.setContent(
-                    '<div class="area"> <span class="text">' + name + '</span> <span class="text2"> 12,345개 </span> </div>'
-                );
+                let content = document.createElement('div');
+                content.className = 'area';
+                content.innerHTML = '<span class="text">' + name + '</span> <span class="text2"' +
+                        '> 12,345개 </span> </div>';
+                console.log(content);
+                customOverlay.setContent(content);
                 customOverlay.setPosition(center);
                 customOverlay.setMap(map);
-
-                // UI 클릭 시 지도 줌 이벤트 활성
-                kakao
-                    .maps
-                    .event
-                    .addListener(customOverlay, 'click', function () {
-                        console.log('click!');
-                        // if (map.getLevel() == 10) {
-                        //     map.setLevel(map.getLevel() - 4, {
-                        //         anchor: centroid(points),
-                        //         animate: {
-                        //             duration: 350
-                        //         }
-                        //     });
-                        //     deletePolygon(polygons);
-                        // } else {
-                        //     map.setLevel(map.getLevel() - 2, {
-                        //         anchor: centroid(points),
-                        //         animate: {
-                        //             duration: 350
-                        //         }
-                        //     });
-                        //     deletePolygon(polygons);
-                        // }
-                    });
+                addEventHandle(content, 'click', onMouseClick);
 
                 kakao
                     .maps
@@ -379,6 +321,74 @@
                     .addListener(map, 'zoom_changed', function () {
                         customOverlay.setMap(null);
                     });
+            }
+
+            // Click 했을 때 호출되는 핸들러 입니다
+            function onMouseClick(e) {
+                console.log('click!');
+                console.log(e);
+                // //UI 클릭 시 지도 줌 이벤트 활성
+                // if (map.getLevel() == 10) {
+                //     map.setLevel(map.getLevel() - 4, {
+                //         anchor: centroid(points),
+                //         animate: {
+                //             duration: 350
+                //         }
+                //     });
+                //     deletePolygon(polygons);
+                // } else {
+                //     map.setLevel(map.getLevel() - 2, {
+                //         anchor: centroid(points),
+                //         animate: {
+                //             duration: 350
+                //         }
+                //     });
+                //     deletePolygon(polygons);
+                // }
+            }
+            // 폴리곤 중심좌표를 구하는 centroid 알고리즘 함수
+            function centroid(points) {
+                let i,
+                    j,
+                    len,
+                    p1,
+                    p2,
+                    f,
+                    area,
+                    x,
+                    y;
+
+                area = x = y = 0;
+
+                for (i = 0, len = points.length, j = len - 1; i < len; j = i++) {
+                    p1 = points[i];
+                    p2 = points[j];
+
+                    f = p1.y * p2.x - p2.y * p1.x;
+                    x += (p1.x + p2.x) * f;
+                    y += (p1.y + p2.y) * f;
+                    area += f * 3;
+                }
+
+                return new kakao
+                    .maps
+                    .LatLng(x / area, y / area);
+            }
+            // 클릭 이벤트로 지도 줌 이벤트 시 전체 폴리곤 제거
+            function deletePolygon(polygons) {
+                for (let index = 0; index < polygons.length; index++) {
+                    polygons[index].setMap(null);
+                }
+                // polygons = [];
+            }
+            
+            // target node에 이벤트 핸들러를 등록하는 함수힙니다
+            function addEventHandle(target, type, callback) {
+                if (target.addEventListener) {
+                    target.addEventListener(type, callback);
+                } else {
+                    target.attachEvent('on' + type, callback);
+                }
             }
         </script>
     </body>

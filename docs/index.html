@@ -41,6 +41,8 @@
             console.log("초기 지도 줌 레벨 값은 :", map.getLevel());
             // 지도 스크롤 줌 액션 잠금
             map.setZoomable(false);
+            // 지도 확대 최대 값 설정
+            map.setMaxLevel(12);
 
             // 지도 스크롤을 2단계 단위로 줌 이벤트 조절
             let map_wheel = document.getElementById('map');
@@ -52,7 +54,6 @@
                 var sign = Math.sign(event.deltaY);
 
                 var changeLevel = level + step * sign;
-
                 map.setLevel(changeLevel);
             });
 
@@ -251,6 +252,7 @@
                 let path = [];
                 let points = [];
                 // console.log(coordinates.length, name);
+
                 $.each(coordinates, function (index, coordinate) {
                     let paths = [];
                     $.each(coordinate, function (index, coord) {
@@ -262,6 +264,7 @@
                     });
                     path.push(paths);
                 });
+
                 let polygon = new kakao
                     .maps
                     .Polygon({
@@ -351,23 +354,23 @@
                     .event
                     .addListener(customOverlay, 'click', function () {
                         console.log('click!');
-                        if (map.getLevel() == 10) {
-                            map.setLevel(map.getLevel() - 4, {
-                                anchor: centroid(points),
-                                animate: {
-                                    duration: 350
-                                }
-                            });
-                            deletePolygon(polygons);
-                        } else {
-                            map.setLevel(map.getLevel() - 2, {
-                                anchor: centroid(points),
-                                animate: {
-                                    duration: 350
-                                }
-                            });
-                            deletePolygon(polygons);
-                        }
+                        // if (map.getLevel() == 10) {
+                        //     map.setLevel(map.getLevel() - 4, {
+                        //         anchor: centroid(points),
+                        //         animate: {
+                        //             duration: 350
+                        //         }
+                        //     });
+                        //     deletePolygon(polygons);
+                        // } else {
+                        //     map.setLevel(map.getLevel() - 2, {
+                        //         anchor: centroid(points),
+                        //         animate: {
+                        //             duration: 350
+                        //         }
+                        //     });
+                        //     deletePolygon(polygons);
+                        // }
                     });
 
                 kakao

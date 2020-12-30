@@ -42,6 +42,20 @@
             // 지도 스크롤 줌 액션 잠금
             map.setZoomable(false);
 
+            // 지도 스크롤을 2단계 단위로 줌 이벤트 조절
+            let map_wheel = document.getElementById('map');
+            map_wheel.addEventListener('wheel', event => {
+                var level = map.getLevel();
+                if (level == 1)
+                    level = 0;
+                var step = 2;
+                var sign = Math.sign(event.deltaY);
+
+                var changeLevel = level + step * sign;
+
+                map.setLevel(changeLevel);
+            });
+
             // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
             var mapTypeControl = new kakao
                 .maps

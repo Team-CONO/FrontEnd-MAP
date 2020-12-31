@@ -82,6 +82,82 @@
                     });
                 });
 
+            let polygons = []; // 지도 줌 이벤트 시 폴리곤 제거를 위한 배열
+            // 폴리곤 렌더링 함수
+            function display(coordinates, name, code) {
+                let path = [];
+                let points = [];
+                // console.log(coordinates.length, name);
+
+                $.each(coordinates, function (index, coordinate) {
+                    let paths = [];
+                    $.each(coordinate, function (index, coord) {
+                        let point = new Object();
+                        point.x = coord[1];
+                        point.y = coord[0];
+                        points.push(point);
+                        paths.push(new kakao.maps.LatLng(coord[1], coord[0]));
+                    });
+                    path.push(paths);
+                });
+
+                let polygon = new kakao
+                    .maps
+                    .Polygon({
+                        map: map,
+                        path: path,
+                        strokeWeight: 2,
+                        strokeColor: '#004c80',
+                        strokeOpacity: 0.8,
+                        // strokeStyle: 'dashed',
+                        fillColor: '#fff',
+                        fillOpacity: 0.3
+                    });
+                polygons.push(polygon);
+
+                // 다각형에 mouseover 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 변경합니다 지역명을 표시하는 커스텀오버레이를 지도위에
+                // 표시합니다
+                kakao
+                    .maps
+                    .event
+                    .addListener(polygon, 'mouseover', function () {
+                        polygon.setOptions({fillColor: '#09f'});
+                    });
+                kakao
+                    .maps
+                    .event
+                    .addListener(polygon, 'mouseout', function () {
+                        polygon.setOptions({fillColor: '#fff'});
+                    });
+
+                display_info(centroid(points), name);
+            };
+            // 행정구역 관련 UI 렌더링 함수
+            function display_info(center, name) {
+                // console.log(center, name);
+
+                let customOverlay = new kakao
+                    .maps
+                    .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
+
+                let content = document.createElement('div');
+                content.className = 'area';
+                content.innerHTML = '<span class="text">' + name + '</span> <span class="text2"' +
+                        '> 12,345개 </span> </div>';
+                // console.log(content);
+                customOverlay.setContent(content);
+                customOverlay.setPosition(center);
+                customOverlay.setMap(map);
+                addEventHandle(content, 'click', onMouseClick(center));
+
+                kakao
+                    .maps
+                    .event
+                    .addListener(map, 'zoom_changed', function () {
+                        customOverlay.setMap(null);
+                    });
+            }
+
             // 지도에 줌 이벤트가 발생하였을 때
             let markers = [];
             kakao
@@ -94,9 +170,8 @@
 
                     // 레벨이 12 인경우 시도 단위로 폴리곤 렌더링
                     if (level == 12) {
-                        for (let index = 0; index < polygons.length; index++) {
-                            polygons[index].setMap(null);
-                        }
+                        deletePolygon(polygons);
+                        deleteMarker(markers);
                         $
                             .ajax(
                                 {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/CTPRVN.json", method: "GET", dataType: "json"}
@@ -115,9 +190,8 @@
                     }
                     // 레벨이 8이상 10이하 인경우 시군구 단위로 폴리곤 렌더링
                     if (level >= 8 && level <= 10) {
-                        for (let index = 0; index < polygons.length; index++) {
-                            polygons[index].setMap(null);
-                        }
+                        deletePolygon(polygons);
+                        deleteMarker(markers);
                         $
                             .ajax(
                                 {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/SIG.json", method: "GET", dataType: "json"}
@@ -136,12 +210,8 @@
                     }
                     // 레벨이 6 인경우 읍면동 단위로 폴리곤 렌더링
                     if (level == 6) {
-                        for (let index = 0; index < polygons.length; index++) {
-                            polygons[index].setMap(null);
-                        }
-                        for (let index = 0; index < markers.length; index++) {
-                            markers[index].setMap(null);
-                        }
+                        deletePolygon(polygons);
+                        deleteMarker(markers);
                         $
                             .ajax(
                                 {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/EMD.json", method: "GET", dataType: "json"}
@@ -160,12 +230,8 @@
                     }
                     // 레벨이 4 인경우 거리 단위 이므로 해당 지역 관련 마커 렌더링
                     if (level == 4) {
-                        for (let index = 0; index < polygons.length; index++) {
-                            polygons[index].setMap(null);
-                        }
-                        for (let index = 0; index < markers.length; index++) {
-                            markers[index].setMap(null);
-                        }
+                        deletePolygon(polygons);
+                        deleteMarker(markers);
                         $
                             .ajax({
                                 url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/starbucks-e" +
@@ -246,106 +312,19 @@
                 }
             }
 
-            let polygons = []; // 지도 줌 이벤트 시 폴리곤 제거를 위한 배열
-            // 폴리곤 렌더링 함수
-            function display(coordinates, name, code) {
-                let path = [];
-                let points = [];
-                // console.log(coordinates.length, name);
-
-                $.each(coordinates, function (index, coordinate) {
-                    let paths = [];
-                    $.each(coordinate, function (index, coord) {
-                        let point = new Object();
-                        point.x = coord[1];
-                        point.y = coord[0];
-                        points.push(point);
-                        paths.push(new kakao.maps.LatLng(coord[1], coord[0]));
-                    });
-                    path.push(paths);
-                });
-
-                let polygon = new kakao
-                    .maps
-                    .Polygon({
-                        map: map,
-                        path: path,
-                        strokeWeight: 2,
-                        strokeColor: '#004c80',
-                        strokeOpacity: 0.8,
-                        // strokeStyle: 'dashed',
-                        fillColor: '#fff',
-                        fillOpacity: 0.3
-                    });
-                polygons.push(polygon);
-
-                // 다각형에 mouseover 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 변경합니다 지역명을 표시하는 커스텀오버레이를 지도위에
-                // 표시합니다
-                kakao
-                    .maps
-                    .event
-                    .addListener(polygon, 'mouseover', function () {
-                        polygon.setOptions({fillColor: '#09f'});
-                    });
-                kakao
-                    .maps
-                    .event
-                    .addListener(polygon, 'mouseout', function () {
-                        polygon.setOptions({fillColor: '#fff'});
-                    });
-
-                display_info(centroid(points), name);
-            };
-
-            // 행정구역 관련 UI 렌더링 함수
-            function display_info(center, name) {
-                // console.log(center, name);
-
-                let customOverlay = new kakao
-                    .maps
-                    .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
-
-                let content = document.createElement('div');
-                content.className = 'area';
-                content.innerHTML = '<span class="text">' + name + '</span> <span class="text2"' +
-                        '> 12,345개 </span> </div>';
-                console.log(content);
-                customOverlay.setContent(content);
-                customOverlay.setPosition(center);
-                customOverlay.setMap(map);
-                addEventHandle(content, 'click', onMouseClick);
-
-                kakao
-                    .maps
-                    .event
-                    .addListener(map, 'zoom_changed', function () {
-                        customOverlay.setMap(null);
-                    });
+            // 지도 줌 값에 따른 폴리곤 제거
+            function deletePolygon(polygons) {
+                for (let index = 0; index < polygons.length; index++) {
+                    polygons[index].setMap(null);
+                }
+            }
+            // 지도 줌 값에 따른 마커 제거
+            function deleteMarker(markers) {
+                for (let index = 0; index < markers.length; index++) {
+                    markers[index].setMap(null);
+                }
             }
 
-            // Click 했을 때 호출되는 핸들러 입니다
-            function onMouseClick(e) {
-                console.log('click!');
-                console.log(e);
-                // //UI 클릭 시 지도 줌 이벤트 활성
-                // if (map.getLevel() == 10) {
-                //     map.setLevel(map.getLevel() - 4, {
-                //         anchor: centroid(points),
-                //         animate: {
-                //             duration: 350
-                //         }
-                //     });
-                //     deletePolygon(polygons);
-                // } else {
-                //     map.setLevel(map.getLevel() - 2, {
-                //         anchor: centroid(points),
-                //         animate: {
-                //             duration: 350
-                //         }
-                //     });
-                //     deletePolygon(polygons);
-                // }
-            }
             // 폴리곤 중심좌표를 구하는 centroid 알고리즘 함수
             function centroid(points) {
                 let i,
@@ -374,14 +353,31 @@
                     .maps
                     .LatLng(x / area, y / area);
             }
-            // 클릭 이벤트로 지도 줌 이벤트 시 전체 폴리곤 제거
-            function deletePolygon(polygons) {
-                for (let index = 0; index < polygons.length; index++) {
-                    polygons[index].setMap(null);
-                }
-                // polygons = [];
+
+            // 행정구역 UI를 클릭 했을 때 호출되는 핸들러 입니다
+            function onMouseClick(center) {
+                return function () {
+                    // console.log('click');
+                    //UI 클릭 시 지도 줌 이벤트 활성
+                    if (map.getLevel() == 10) {
+                        map.setLevel(map.getLevel() - 4, {
+                            anchor: center,
+                            animate: {
+                                duration: 350
+                            }
+                        });
+                        deletePolygon(polygons);
+                    } else {
+                        map.setLevel(map.getLevel() - 2, {
+                            anchor: center,
+                            animate: {
+                                duration: 350
+                            }
+                        });
+                        deletePolygon(polygons);
+                    }
+                };
             }
-            
             // target node에 이벤트 핸들러를 등록하는 함수힙니다
             function addEventHandle(target, type, callback) {
                 if (target.addEventListener) {

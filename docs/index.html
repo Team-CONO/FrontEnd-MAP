@@ -38,6 +38,7 @@
                         .LatLng(37.5642135, 127.0016985), // 초기 지도의 중심좌표
                     level: 12 // 초기 지도의 확대 레벨
                 });
+            let loca = map.getCenter(); // 초기 지도의 중심좌표 변수
             console.log("초기 지도 줌 레벨 값은 :", map.getLevel());
             // 지도 스크롤 줌 액션 잠금
             map.setZoomable(false);
@@ -67,18 +68,39 @@
 
             // 초기 지도엔 시도 단위로 폴리곤 렌더링
             $
-                .ajax(
-                    {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/CTPRVN.json", method: "GET", dataType: "json"}
-                )
+                .ajax({
+                    // crossDomain: true,
+                    method: "GET",
+                    dataType: "json",
+                    // headers: {
+                    //     'Access-Control-Allow-Origin': '*'
+                    // },
+                    url: "https://stories282.shop/geo",
+                    data: {
+                        lat: loca.getLat(),
+                        lot: loca.getLng(),
+                        distance: '100',
+                        map: 'ctp'
+                    },
+                    success: function (result) {
+                        console.log("Success");
+                        // console.log(result);
+                    },
+                    error: function (e) {
+                        console.log('Error');
+                        console.log(e);
+                    }
+                })
                 .done(function (params) {
-                    let data = params.features;
+                    console.log(params);
+                    let data = params.data;
                     let coordinates = [];
                     let name = '';
                     $.each(data, function (index, val) {
-                        coordinates = val.geometry.coordinates;
-                        name = val.properties.CTP_KOR_NM;
-                        // console.log(coordinates, name);
-                        display(coordinates, name, "CTPRVN");
+                        coordinates = val.coordinates;
+                        name = val.KOR_NM;
+                        console.log(coordinates, name);
+                        // display(coordinates, name, "CTPRVN");
                     });
                 });
 
@@ -169,115 +191,115 @@
                     console.log("현재 지도 줌 레벨 값은 :", level);
 
                     // 레벨이 12 인경우 시도 단위로 폴리곤 렌더링
-                    if (level == 12) {
-                        deletePolygon(polygons);
-                        deleteMarker(markers);
-                        $
-                            .ajax(
-                                {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/CTPRVN.json", method: "GET", dataType: "json"}
-                            )
-                            .done(function (params) {
-                                let data = params.features;
-                                let coordinates = [];
-                                let name = '';
-                                $.each(data, function (index, val) {
-                                    coordinates = val.geometry.coordinates;
-                                    name = val.properties.CTP_KOR_NM;
-                                    // console.log(coordinates, name);
-                                    display(coordinates, name, "CTPRVN");
-                                });
-                            });
-                    }
-                    // 레벨이 8이상 10이하 인경우 시군구 단위로 폴리곤 렌더링
-                    if (level >= 8 && level <= 10) {
-                        deletePolygon(polygons);
-                        deleteMarker(markers);
-                        $
-                            .ajax(
-                                {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/SIG.json", method: "GET", dataType: "json"}
-                            )
-                            .done(function (params) {
-                                let data = params.features;
-                                let coordinates = [];
-                                let name = '';
-                                $.each(data, function (index, val) {
-                                    coordinates = val.geometry.coordinates;
-                                    name = val.properties.SIG_KOR_NM;
-                                    // console.log(coordinates, name);
-                                    display(coordinates, name, "SIG");
-                                });
-                            });
-                    }
-                    // 레벨이 6 인경우 읍면동 단위로 폴리곤 렌더링
-                    if (level == 6) {
-                        deletePolygon(polygons);
-                        deleteMarker(markers);
-                        $
-                            .ajax(
-                                {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/EMD.json", method: "GET", dataType: "json"}
-                            )
-                            .done(function (params) {
-                                let data = params.features;
-                                let coordinates = [];
-                                let name = '';
-                                $.each(data, function (index, val) {
-                                    coordinates = val.geometry.coordinates;
-                                    name = val.properties.EMD_KOR_NM;
-                                    // console.log(coordinates, name);
-                                    display(coordinates, name, "EMD");
-                                });
-                            });
-                    }
-                    // 레벨이 4 인경우 거리 단위 이므로 해당 지역 관련 마커 렌더링
-                    if (level == 4) {
-                        deletePolygon(polygons);
-                        deleteMarker(markers);
-                        $
-                            .ajax({
-                                url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/starbucks-e" +
-                                        "dited.json",
-                                method: "GET",
-                                dataType: "json"
-                            })
-                            .done(function (data) {
-                                markers = $(data).map(function (i, value) {
-                                    return new kakao
-                                        .maps
-                                        .Marker({
-                                            position: new kakao
-                                                .maps
-                                                .LatLng(value.lat, value.lot)
-                                        });
-                                });
-                                for (var index = 0; index < markers.length; index++) {
-                                    markers[index].setMap(map);
-                                    //마커에 표시할 인포윈도우를 생성합니다
-                                    var infowindow = new kakao
-                                        .maps
-                                        .InfoWindow({
-                                            content: "스타벅스 " + data[index].s_name // 인포윈도우에 표시할 내용
-                                        });
-                                    // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다 이벤트 리스너로는 클로저를 만들어 등록합니다 for문에서 클로저를
-                                    // 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
-                                    kakao
-                                        .maps
-                                        .event
-                                        .addListener(
-                                            markers[index],
-                                            'mouseover',
-                                            makeOverListener(map, markers[index], infowindow)
-                                        );
-                                    kakao
-                                        .maps
-                                        .event
-                                        .addListener(markers[index], 'mouseout', makeOutListener(infowindow));
-                                    kakao
-                                        .maps
-                                        .event
-                                        .addListener(markers[index], 'click', makeClickListener(data[index].s_name));
-                                }
-                            });
-                    }
+                    // if (level == 12) {
+                    //     deletePolygon(polygons);
+                    //     deleteMarker(markers);
+                    //     $
+                    //         .ajax(
+                    //             {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/CTPRVN.json", method: "GET", dataType: "json"}
+                    //         )
+                    //         .done(function (params) {
+                    //             let data = params.features;
+                    //             let coordinates = [];
+                    //             let name = '';
+                    //             $.each(data, function (index, val) {
+                    //                 coordinates = val.geometry.coordinates;
+                    //                 name = val.properties.CTP_KOR_NM;
+                    //                 // console.log(coordinates, name);
+                    //                 display(coordinates, name, "CTPRVN");
+                    //             });
+                    //         });
+                    // }
+                    // // 레벨이 8이상 10이하 인경우 시군구 단위로 폴리곤 렌더링
+                    // if (level >= 8 && level <= 10) {
+                    //     deletePolygon(polygons);
+                    //     deleteMarker(markers);
+                    //     $
+                    //         .ajax(
+                    //             {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/SIG.json", method: "GET", dataType: "json"}
+                    //         )
+                    //         .done(function (params) {
+                    //             let data = params.features;
+                    //             let coordinates = [];
+                    //             let name = '';
+                    //             $.each(data, function (index, val) {
+                    //                 coordinates = val.geometry.coordinates;
+                    //                 name = val.properties.SIG_KOR_NM;
+                    //                 // console.log(coordinates, name);
+                    //                 display(coordinates, name, "SIG");
+                    //             });
+                    //         });
+                    // }
+                    // // 레벨이 6 인경우 읍면동 단위로 폴리곤 렌더링
+                    // if (level == 6) {
+                    //     deletePolygon(polygons);
+                    //     deleteMarker(markers);
+                    //     $
+                    //         .ajax(
+                    //             {url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/EMD.json", method: "GET", dataType: "json"}
+                    //         )
+                    //         .done(function (params) {
+                    //             let data = params.features;
+                    //             let coordinates = [];
+                    //             let name = '';
+                    //             $.each(data, function (index, val) {
+                    //                 coordinates = val.geometry.coordinates;
+                    //                 name = val.properties.EMD_KOR_NM;
+                    //                 // console.log(coordinates, name);
+                    //                 display(coordinates, name, "EMD");
+                    //             });
+                    //         });
+                    // }
+                    // // 레벨이 4 인경우 거리 단위 이므로 해당 지역 관련 마커 렌더링
+                    // if (level == 4) {
+                    //     deletePolygon(polygons);
+                    //     deleteMarker(markers);
+                    //     $
+                    //         .ajax({
+                    //             url: "https://raw.githubusercontent.com/Team-CONO/FrontEnd-MAP/main/json/starbucks-e" +
+                    //                     "dited.json",
+                    //             method: "GET",
+                    //             dataType: "json"
+                    //         })
+                    //         .done(function (data) {
+                    //             markers = $(data).map(function (i, value) {
+                    //                 return new kakao
+                    //                     .maps
+                    //                     .Marker({
+                    //                         position: new kakao
+                    //                             .maps
+                    //                             .LatLng(value.lat, value.lot)
+                    //                     });
+                    //             });
+                    //             for (var index = 0; index < markers.length; index++) {
+                    //                 markers[index].setMap(map);
+                    //                 //마커에 표시할 인포윈도우를 생성합니다
+                    //                 var infowindow = new kakao
+                    //                     .maps
+                    //                     .InfoWindow({
+                    //                         content: "스타벅스 " + data[index].s_name // 인포윈도우에 표시할 내용
+                    //                     });
+                    //                 // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다 이벤트 리스너로는 클로저를 만들어 등록합니다 for문에서 클로저를
+                    //                 // 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+                    //                 kakao
+                    //                     .maps
+                    //                     .event
+                    //                     .addListener(
+                    //                         markers[index],
+                    //                         'mouseover',
+                    //                         makeOverListener(map, markers[index], infowindow)
+                    //                     );
+                    //                 kakao
+                    //                     .maps
+                    //                     .event
+                    //                     .addListener(markers[index], 'mouseout', makeOutListener(infowindow));
+                    //                 kakao
+                    //                     .maps
+                    //                     .event
+                    //                     .addListener(markers[index], 'click', makeClickListener(data[index].s_name));
+                    //             }
+                    //         });
+                    // }
                 });
 
             // 인포윈도우를 표시하는 클로저를 만드는 함수입니다
@@ -357,8 +379,7 @@
             // 행정구역 UI를 클릭 했을 때 호출되는 핸들러 입니다
             function onMouseClick(center) {
                 return function () {
-                    // console.log('click');
-                    //UI 클릭 시 지도 줌 이벤트 활성
+                    // console.log('click'); UI 클릭 시 지도 줌 이벤트 활성
                     if (map.getLevel() == 10) {
                         map.setLevel(map.getLevel() - 4, {
                             anchor: center,

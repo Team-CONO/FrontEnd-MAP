@@ -82,7 +82,7 @@
                     let my_location = map.getCenter();
 
                     // 지도의 현재 레벨을 얻어옵니다
-                    var level = map.getLevel();
+                    let level = map.getLevel();
                     console.log("현재 지도 줌 레벨 값은 :", level);
 
                     // 레벨이 10 이상인 경우 시도 단위로 폴리곤 렌더링
@@ -114,14 +114,19 @@
                 });
 
             // 지도에 마우스 드래그 이벤트가 발생하였을 때
-            // kakao
-            //     .maps
-            //     .event
-            //     .addListener(map, 'drag', function () {
-            //         let my_location = map.getCenter();
-            //         console.log(my_location);
-            //         mapUnit(my_location, save_view);
-            //     });
+            kakao
+                .maps
+                .event
+                .addListener(map, 'dragend', function () {
+                    let my_location = map.getCenter();
+                    let level = map.getLevel();
+                    // console.log(my_location);
+
+                    if (level != 4) {
+                        deletePolygon(polygons);
+                        mapUnit(my_location, save_view);
+                    }
+                });
 
             // 지도 단위에 따른 API 'geo' 호출 함수
             function mapUnit(my_location, map_view) {
@@ -297,6 +302,13 @@
                     .maps
                     .event
                     .addListener(map, 'zoom_changed', function () {
+                        customOverlay.setMap(null);
+                    });
+
+                kakao
+                    .maps
+                    .event
+                    .addListener(map, 'dragend', function () {
                         customOverlay.setMap(null);
                     });
             }

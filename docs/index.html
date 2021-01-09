@@ -6,8 +6,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!--jQuery 로드-->
         <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-        <!--행정구역 관련 UI CSS 로드-->
-        <link rel="stylesheet" href="css/info_window.css">
+        <!--지도 UI 관련 CSS 로드-->
+        <link rel="stylesheet" href="css/map.css">
         <title>Korea_Polygon</title>
     </head>
     <body>
@@ -38,14 +38,17 @@
                         .LatLng(37.5642135, 127.0016985), // 초기 지도의 중심좌표
                     level: 8 // 초기 지도의 확대 레벨
                 });
-            let my_location = map.getCenter(); // 초기 지도의 중심좌표 변수
             console.log("초기 지도 줌 레벨 값은 :", map.getLevel());
             // 지도 스크롤 줌 액션 잠금
             map.setZoomable(false);
             // 지도 확대 최대 값 설정
             map.setMaxLevel(12);
+            // 초기 지도의 중심좌표 변수
+            let my_location = map.getCenter();
+            // 지도 단위 변수
+            let save_view;
 
-            // 지도 스크롤을 2단계 단위로 줌 이벤트 조절
+            // 지도 스크롤 줌 액션을 각각 숫자 2 단위로 적용
             let map_wheel = document.getElementById('map');
             map_wheel.addEventListener('wheel', event => {
                 var level = map.getLevel();
@@ -67,36 +70,159 @@
             map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
 
             // 초기 지도엔 서울시를 중심으로 시군구 단위로 폴리곤 렌더링
-            $
-                .ajax({
-                    method: "GET",
-                    dataType: "json",
-                    url: "https://stories282.shop/geo",
-                    data: {
-                        lat: my_location.getLat(),
-                        lot: my_location.getLng(),
-                        distance: '50',
-                        map: 'sig'
-                    },
-                    success: function (result) {
-                        console.log('Success:', result);
-                    },
-                    error: function (e) {
-                        console.log('Error:', e);
+            mapUnit(my_location, 'sig');
+
+            // 지도에 줌 이벤트가 발생하였을 때
+            let markers = [];
+            kakao
+                .maps
+                .event
+                .addListener(map, 'zoom_changed', function () {
+                    // 지도의 현재 중심좌표를 얻어옵니다
+                    let my_location = map.getCenter();
+
+                    // 지도의 현재 레벨을 얻어옵니다
+                    var level = map.getLevel();
+                    console.log("현재 지도 줌 레벨 값은 :", level);
+
+                    // 레벨이 10 이상인 경우 시도 단위로 폴리곤 렌더링
+                    if (level >= 10) {
+                        deletePolygon(polygons);
+                        deleteMarker(markers);
+
+                        mapUnit(my_location, 'ctp');
                     }
-                })
-                .done(function (params) {
-                    // console.log(params);
-                    let data = params.data;
-                    let coordinates = [];
-                    let name = '';
-                    $.each(data, function (index, val) {
-                        coordinates = val.coordinates;
-                        name = val.KOR_NM;
-                        // console.log(coordinates, name);
-                        display(coordinates, name);
-                    });
+                    // 레벨이 8인 경우 시군구 단위로 폴리곤 렌더링
+                    if (level == 8) {
+                        deletePolygon(polygons);
+                        deleteMarker(markers);
+
+                        mapUnit(my_location, 'sig');
+                    }
+                    // 레벨이 6 인경우 읍면동 단위로 폴리곤 렌더링
+                    if (level == 6) {
+                        deletePolygon(polygons);
+                        deleteMarker(markers);
+
+                        mapUnit(my_location, 'emd');
+                    }
+                    //레벨이 4 인경우 거리 단위 이므로 해당 지역 관련 마커 렌더링
+                    if (level == 4) {
+                        deletePolygon(polygons);
+                        deleteMarker(markers);
+                    }
                 });
+
+            // 지도에 마우스 드래그 이벤트가 발생하였을 때
+            // kakao
+            //     .maps
+            //     .event
+            //     .addListener(map, 'drag', function () {
+            //         let my_location = map.getCenter();
+            //         console.log(my_location);
+            //         mapUnit(my_location, save_view);
+            //     });
+
+            // 지도 단위에 따른 API 'geo' 호출 함수
+            function mapUnit(my_location, map_view) {
+                if (map_view == "ctp") {
+                    save_view = "ctp";
+                    $
+                        .ajax({
+                            method: "GET",
+                            dataType: "json",
+                            url: "https://stories282.shop/geo",
+                            data: {
+                                lat: my_location.getLat(),
+                                lot: my_location.getLng(),
+                                distance: '200',
+                                map: 'ctp'
+                            },
+                            success: function (result) {
+                                console.log('Success:', result);
+                            },
+                            error: function (e) {
+                                console.log('Error:', e);
+                            }
+                        })
+                        .done(function (params) {
+                            // console.log(params);
+                            let data = params.data;
+                            let coordinates = [];
+                            let name = '';
+                            $.each(data, function (index, val) {
+                                coordinates = val.coordinates;
+                                name = val.KOR_NM;
+                                // console.log(coordinates, name);
+                                display(coordinates, name);
+                            });
+                        });
+                } else if (map_view == "sig") {
+                    save_view = "sig";
+                    $
+                        .ajax({
+                            method: "GET",
+                            dataType: "json",
+                            url: "https://stories282.shop/geo",
+                            data: {
+                                lat: my_location.getLat(),
+                                lot: my_location.getLng(),
+                                distance: '20',
+                                map: 'sig'
+                            },
+                            success: function (result) {
+                                console.log('Success:', result);
+                            },
+                            error: function (e) {
+                                console.log('Error:', e);
+                            }
+                        })
+                        .done(function (params) {
+                            // console.log(params);
+                            let data = params.data;
+                            let coordinates = [];
+                            let name = '';
+                            $.each(data, function (index, val) {
+                                coordinates = val.coordinates;
+                                name = val.KOR_NM;
+                                // console.log(coordinates, name);
+                                display(coordinates, name);
+                            });
+                        });
+                } else if (map_view == "emd") {
+                    save_view = "emd";
+                    $
+                        .ajax({
+                            method: "GET",
+                            dataType: "json",
+                            url: "https://stories282.shop/geo",
+                            data: {
+                                lat: my_location.getLat(),
+                                lot: my_location.getLng(),
+                                distance: '5',
+                                map: 'emd'
+                            },
+                            success: function (result) {
+                                console.log('Success:', result);
+                            },
+                            error: function (e) {
+                                console.log('Error:', e);
+                            }
+                        })
+                        .done(function (params) {
+                            // console.log(params);
+                            let data = params.data;
+                            let coordinates = [];
+                            let name = '';
+                            $.each(data, function (index, val) {
+                                coordinates = val.coordinates;
+                                name = val.KOR_NM;
+                                // console.log(coordinates, name);
+                                display(coordinates, name);
+                            });
+                        });
+                }
+            }
 
             let polygons = []; // 지도 줌 이벤트 시 폴리곤 제거를 위한 배열
             // 폴리곤 렌더링 함수
@@ -146,12 +272,12 @@
                     .addListener(polygon, 'mouseout', function () {
                         polygon.setOptions({fillColor: '#fff'});
                     });
-                    
+
                 let cnt = 0;
-                display_info(centroid(points), name, cnt);
+                displayInfo(centroid(points), name, cnt);
             };
             // 행정구역 관련 UI 렌더링 함수
-            function display_info(center, name, cnt) {
+            function displayInfo(center, name, cnt) {
                 // console.log(center, name);
                 let customOverlay = new kakao
                     .maps
@@ -175,196 +301,6 @@
                     });
             }
 
-            // 지도에 줌 이벤트가 발생하였을 때
-            let markers = [];
-            kakao
-                .maps
-                .event
-                .addListener(map, 'zoom_changed', function () {
-                    // 지도의 현재 중심좌표를 얻어옵니다
-                    let my_location = map.getCenter();            
-                    // 지도의 현재 레벨을 얻어옵니다
-                    var level = map.getLevel();
-                    console.log("현재 지도 줌 레벨 값은 :", level);
-
-                    // 레벨이 12 인경우 시도 단위로 폴리곤 렌더링
-                    if (level == 12) {
-                        deletePolygon(polygons);
-                        deleteMarker(markers);
-                        $
-                            .ajax({
-                                method: "GET",
-                                dataType: "json",
-                                url: "https://stories282.shop/geo",
-                                data: {
-                                    lat: my_location.getLat(),
-                                    lot: my_location.getLng(),
-                                    distance: '500',
-                                    map: 'ctp'
-                                },
-                                success: function (result) {
-                                    console.log('Success:', result);
-                                },
-                                error: function (e) {
-                                    console.log('Error:', e);
-                                }
-                            })
-                            .done(function (params) {
-                                // console.log(params);
-                                let data = params.data;
-                                let coordinates = [];
-                                let name = '';
-                                $.each(data, function (index, val) {
-                                    coordinates = val.coordinates;
-                                    name = val.KOR_NM;
-                                    // console.log(coordinates, name);
-                                    display(coordinates, name);
-                                });
-                            });
-                    }
-                    // 레벨이 8이상 10이하 인경우 시군구 단위로 폴리곤 렌더링
-                    if (level >= 8 && level <= 10) {
-                        deletePolygon(polygons);
-                        deleteMarker(markers);
-                        $
-                            .ajax({
-                                method: "GET",
-                                dataType: "json",
-                                url: "https://stories282.shop/geo",
-                                data: {
-                                    lat: my_location.getLat(),
-                                    lot: my_location.getLng(),
-                                    distance: '50',
-                                    map: 'sig'
-                                },
-                                success: function (result) {
-                                    console.log('Success:', result);
-                                },
-                                error: function (e) {
-                                    console.log('Error:', e);
-                                }
-                            })
-                            .done(function (params) {
-                                // console.log(params);
-                                let data = params.data;
-                                let coordinates = [];
-                                let name = '';
-                                $.each(data, function (index, val) {
-                                    coordinates = val.coordinates;
-                                    name = val.KOR_NM;
-                                    // console.log(coordinates, name);
-                                    display(coordinates, name);
-                                });
-                            });
-                    }
-                    // 레벨이 6 인경우 읍면동 단위로 폴리곤 렌더링
-                    if (level == 6) {
-                        deletePolygon(polygons);
-                        deleteMarker(markers);
-                        $
-                            .ajax({
-                                method: "GET",
-                                dataType: "json",
-                                url: "https://stories282.shop/geo",
-                                data: {
-                                    lat: my_location.getLat(),
-                                    lot: my_location.getLng(),
-                                    distance: '30',
-                                    map: 'emd'
-                                },
-                                success: function (result) {
-                                    console.log('Success:', result);
-                                },
-                                error: function (e) {
-                                    console.log('Error:', e);
-                                }
-                            })
-                            .done(function (params) {
-                                // console.log(params);
-                                let data = params.data;
-                                let coordinates = [];
-                                let name = '';
-                                $.each(data, function (index, val) {
-                                    coordinates = val.coordinates;
-                                    name = val.KOR_NM;
-                                    // console.log(coordinates, name);
-                                    display(coordinates, name);
-                                });
-                            });
-                    }
-                    //레벨이 4 인경우 거리 단위 이므로 해당 지역 관련 마커 렌더링
-                    if (level == 4) {
-                        deletePolygon(polygons);
-                        deleteMarker(markers);
-                    //     $
-                    //         .ajax({
-                    //             method: "GET",
-                    //             dataType: "json",
-                    //             url: "https://stories282.shop/geo",
-                    //             data: {
-                    //                 lat: my_location.getLat(),
-                    //                 lot: my_location.getLng(),
-                    //                 distance: '500',
-                    //                 map: 'ctp'
-                    //             },
-                    //             success: function (result) {
-                    //                 console.log('Success:', result);
-                    //             },
-                    //             error: function (e) {
-                    //                 console.log('Error:', e);
-                    //             }
-                    //         })
-                    //         .done(function (params) {
-                    //             // console.log(params);
-                    //             markers = $(params).map(function (i, value) {
-                    //                 return new kakao
-                    //                     .maps
-                    //                     .Marker({
-                    //                         position: new kakao
-                    //                             .maps
-                    //                             .LatLng(value.lat, value.lot)
-                    //                     });
-                    //             });
-                    //             for (var index = 0; index < markers.length; index++) {
-                    //                 markers[index].setMap(map);
-                    //                 // 마커에 표시할 인포윈도우를 생성합니다
-                    //                 var infowindow = new kakao
-                    //                     .maps
-                    //                     .InfoWindow({
-                    //                         content: "스타벅스 " + data[index].s_name // 인포윈도우에 표시할 내용
-                    //                     });
-                    //                 // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다 이벤트 리스너로는 클로저를 만들어 등록합니다 for문에서 클로저를
-                    //                 // 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
-                    //                 kakao
-                    //                     .maps
-                    //                     .event
-                    //                     .addListener(
-                    //                         markers[index],
-                    //                         'mouseover',
-                    //                         makeOverListener(map, markers[index], infowindow)
-                    //                     );
-                    //                 kakao
-                    //                     .maps
-                    //                     .event
-                    //                     .addListener(markers[index], 'mouseout', makeOutListener(infowindow));
-                    //                 kakao
-                    //                     .maps
-                    //                     .event
-                    //                     .addListener(markers[index], 'click', makeClickListener(data[index].s_name));
-                    //             }
-                    //         });
-                    }
-                });
-
-            // kakao
-            //     .maps
-            //     .event
-            //     .addListener(map, 'drag', function () {
-            //         // do something
-            //         let my_location = map.getCenter();
-            //         console.log(my_location);
-            //     });
-
             // 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
             function zoomIn() {
                 map.setLevel(map.getLevel() - 2);
@@ -377,6 +313,7 @@
                     map.setLevel(map.getLevel() + 2);
                 }
             }
+
             // 지도 줌 값에 따른 폴리곤 제거
             function deletePolygon(polygons) {
                 for (let index = 0; index < polygons.length; index++) {
@@ -389,6 +326,7 @@
                     markers[index].setMap(null);
                 }
             }
+
             // 폴리곤 중심좌표를 구하는 centroid 알고리즘 함수
             function centroid(points) {
                 let i,
@@ -418,24 +356,25 @@
                     .LatLng(x / area, y / area);
             }
 
-            // 인포윈도우를 표시하는 클로저를 만드는 함수입니다
+            // 마커의 인포윈도우를 표시하는 클로저를 만드는 함수입니다
             function makeOverListener(map, marker, infowindow) {
                 return function () {
                     infowindow.open(map, marker);
                 };
             }
-            // 인포윈도우를 닫는 클로저를 만드는 함수입니다
+            // 마커의 인포윈도우를 닫는 클로저를 만드는 함수입니다
             function makeOutListener(infowindow) {
                 return function () {
                     infowindow.close();
                 };
             }
-            // 인포윈도우 클릭하는 클로저를 만드는 함수
+            // 마커의 인포윈도우를 클릭하는 클로저를 만드는 함수
             function makeClickListener(title) {
                 return function () {
                     console.log('클릭된 지점은 ' + title + ' 입니다.');
                 }
             }
+
             // 행정구역 UI를 클릭 했을 때 호출되는 핸들러 입니다
             function onMouseClick(center) {
                 return function () {

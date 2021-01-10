@@ -143,9 +143,6 @@
                                 distance: '200',
                                 map: 'ctp'
                             },
-                            success: function (result) {
-                                console.log('Success:', result);
-                            },
                             error: function (e) {
                                 console.log('Error:', e);
                             }
@@ -175,9 +172,6 @@
                                 distance: '20',
                                 map: 'sig'
                             },
-                            success: function (result) {
-                                console.log('Success:', result);
-                            },
                             error: function (e) {
                                 console.log('Error:', e);
                             }
@@ -206,9 +200,6 @@
                                 lot: my_location.getLng(),
                                 distance: '5',
                                 map: 'emd'
-                            },
-                            success: function (result) {
-                                console.log('Success:', result);
                             },
                             error: function (e) {
                                 console.log('Error:', e);
@@ -278,25 +269,59 @@
                         polygon.setOptions({fillColor: '#fff'});
                     });
 
-                let cnt = 0;
-                displayInfo(centroid(points), name, cnt);
+                displayInfo(centroid(points), name);
             };
             // 행정구역 관련 UI 렌더링 함수
-            function displayInfo(center, name, cnt) {
+            function displayInfo(center, name) {
                 // console.log(center, name);
                 let customOverlay = new kakao
                     .maps
                     .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
 
-                let content = document.createElement('div');
-                content.className = 'area';
-                content.innerHTML = '<span class="text">' + name +
-                        '</span><span class="text2">' + cnt + '개</span></div>';
-                // console.log(content);
-                customOverlay.setContent(content);
-                customOverlay.setPosition(center);
-                customOverlay.setMap(map);
-                addEventHandle(content, 'click', onMouseClick(center));
+                $
+                    .ajax({
+                        method: "POST",
+                        dataType: "json",
+                        url: "https://stories282.shop/forsale/map",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            "lat": center.Ma,
+                            "lot": center.La,
+                            "distance": 5,
+                            "geoCDS": "string",
+                            "map": "string",
+                            "page": 0,
+                            "printSize": 0
+                        }),
+                        error: function (e) {
+                            console.log('Error...', e);
+                        }
+                    })
+                    .done(function (result) {
+                        // console.log(result.data[0].cnt);
+                        let content = document.createElement('div');
+                        content.className = 'area';
+                        content.innerHTML = '<span class="text">' + name +
+                                '</span><span class="text2">' + result
+                            .data[0]
+                            .cnt + '개</span></div>';
+                        // console.log(content);
+                        customOverlay.setContent(content);
+                        customOverlay.setPosition(center);
+                        customOverlay.setMap(map);
+                        addEventHandle(content, 'click', onMouseClick(center));
+
+                    });
+
+                // let content = document.createElement('div');
+                // content.className = 'area';
+                // content.innerHTML = '<span class="text">' + name +
+                //         '</span><span class="text2">' + cnt + '개</span></div>';
+                // // console.log(content);
+                // customOverlay.setContent(content);
+                // customOverlay.setPosition(center);
+                // customOverlay.setMap(map);
+                // addEventHandle(content, 'click', onMouseClick(center));
 
                 kakao
                     .maps

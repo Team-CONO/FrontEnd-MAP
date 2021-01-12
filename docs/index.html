@@ -149,14 +149,17 @@
                             let coordinates = [];
                             let centers = [];
                             let name = '';
+                            let getCD = [];
                             $.each(data, function (index, val) {
                                 mapType = val.map_type;
                                 coordinates = val.coordinates;
                                 centers = [val.center_lat, val.center_lot];
                                 name = val.KOR_NM;
+                                getCD.push(val.CD);
                                 // console.log(coordinates, name);
                                 display(coordinates, name, centers);
                             });
+                            mapCnt(getCD);
                         });
                 } else if (map_type == "sig") {
                     $
@@ -214,14 +217,17 @@
                             let coordinates = [];
                             let centers = [];
                             let name = '';
+                            let getCD = [];
                             $.each(data, function (index, val) {
                                 mapType = val.map_type;
                                 coordinates = val.coordinates;
                                 centers = [val.center_lat, val.center_lot];
                                 name = val.KOR_NM;
+                                getCD.push(val.CD);
                                 // console.log(coordinates, name);
                                 display(coordinates, name, centers);
                             });
+                            mapCnt(getCD);
                         });
                 }
             }
@@ -278,40 +284,6 @@
                     .maps
                     .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
 
-                // $
-                //     .ajax({
-                //         method: "POST",
-                //         dataType: "json",
-                //         url: "https://stories282.shop/forsale/map",
-                //         contentType: "application/json",
-                //         data: JSON.stringify({
-                //             "lat": center.Ma,
-                //             "lot": center.La,
-                //             "distance": 5,
-                //             "geoCDS": "string",
-                //             "map": mapType,
-                //             "page": 0,
-                //             "printSize": 10
-                //         }),
-                //         error: function (e) {
-                //             console.log('Error...', e);
-                //         }
-                //     })
-                //     .done(function (result) {
-                //         // console.log(result.data[0].cnt);
-                //         let content = document.createElement('div');
-                //         content.className = 'area';
-                //         content.innerHTML = '<span class="text">' + name +
-                //                 '</span><span class="text2">' + result
-                //             .data[0]
-                //             .cnt + '개</span></div>';
-                //         // console.log(content);
-                //         customOverlay.setContent(content);
-                //         customOverlay.setPosition(center);
-                //         customOverlay.setMap(map);
-                //         addEventHandle(content, 'click', onMouseClick(center));
-                //     });
-
                 let content = document.createElement('div');
                 content.className = 'area';
                 content.innerHTML = '<span class="text">' + name + '</span><span class="text2">' +
@@ -335,42 +307,43 @@
                         customOverlay.setMap(null);
                     });
             }
-
+            // 행정구역 매물 카운트 함수
             function mapCnt(getCD) {
-                console.log(getCD);
-                // $
-                //     .ajax({
-                //         method: "POST",
-                //         dataType: "json",
-                //         url: "https://stories282.shop/forsale/map",
-                //         contentType: "application/json",
-                //         data: JSON.stringify({
-                //             "lat": mapCenter.getLat(),
-                //             "lot": mapCenter.getLng(),
-                //             "distance": 100,
-                //             "geoCDS": "string",
-                //             "map": mapType,
-                //             "page": 0,
-                //             "printSize": 10
-                //         }),
-                //         error: function (e) {
-                //             console.log('Error...', e);
-                //         }
-                //     })
-                //     .done(function (result) {
-                //         console.log(result);
-                //         // let content = document.createElement('div');
-                //         // content.className = 'area';
-                //         // content.innerHTML = '<span class="text">' + name +
-                //         //         '</span><span class="text2">' + result
-                //         //     .data[0]
-                //         //     .cnt + '개</span></div>';
-                //         // // console.log(content);
-                //         // customOverlay.setContent(content);
-                //         // customOverlay.setPosition(center);
-                //         // customOverlay.setMap(map);
-                //         // addEventHandle(content, 'click', onMouseClick(center));
-                //     });
+                // console.log(getCD);
+                let str = getCD.join(',');
+                $
+                    .ajax({
+                        method: "POST",
+                        dataType: "json",
+                        url: "https://stories282.shop/forsale/map",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            "lat": mapCenter.getLat(),
+                            "lot": mapCenter.getLng(),
+                            "distance": 100,
+                            "geoCDS": str,
+                            "map": mapType,
+                            "page": 0,
+                            "printSize": 10
+                        }),
+                        error: function (e) {
+                            console.log('Error...', e);
+                        }
+                    })
+                    .done(function (result) {
+                        console.log(result);
+                        // let content = document.createElement('div');
+                        // content.className = 'area';
+                        // content.innerHTML = '<span class="text">' + name +
+                        //         '</span><span class="text2">' + result
+                        //     .data[0]
+                        //     .cnt + '개</span></div>';
+                        // // console.log(content);
+                        // customOverlay.setContent(content);
+                        // customOverlay.setPosition(center);
+                        // customOverlay.setMap(map);
+                        // addEventHandle(content, 'click', onMouseClick(center));
+                    });
             }
 
             // 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다

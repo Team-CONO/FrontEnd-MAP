@@ -79,7 +79,7 @@
                 .event
                 .addListener(map, 'zoom_changed', function () {
                     // 지도의 현재 중심좌표를 얻어옵니다
-                    let map_center = map.getCenter();
+                    map_center = map.getCenter();
 
                     // 지도의 현재 레벨을 얻어옵니다
                     let level = map.getLevel();
@@ -115,7 +115,7 @@
                 .maps
                 .event
                 .addListener(map, 'dragend', function () {
-                    let map_center = map.getCenter();
+                    map_center = map.getCenter();
                     let level = map.getLevel();
                     // console.log(map_center);
 

@@ -36,28 +36,30 @@
                     center: new kakao
                         .maps
                         .LatLng(37.5642135, 127.0016985), // 초기 지도의 중심좌표
-                    level: 8 // 초기 지도의 확대 레벨
+                    level: 8, // 초기 지도의 확대 레벨
+                    disableDoubleClickZoom: true, // 지도의 더블클릭 방지
+                    scrollwheel: false // 지도의 스크롤 및 터치로 인한 줌 액션 방지
                 });
             console.log("초기 지도 줌 레벨 값은 :", map.getLevel());
-            // 지도 스크롤 줌 액션 잠금
-            map.setZoomable(false);
             // 지도 확대 최대 값 설정
             map.setMaxLevel(12);
-            // 초기 지도의 중심좌표 변수
+            // 지도의 중심좌표 변수
             let mapCenter = map.getCenter();
-            // 지도 단위 변수
+            // 지도의 타입 변수
             let mapType;
+            // 지도의 줌 레벨 변수
+            let mapLevel;
 
             // 지도 스크롤 줌 액션을 각각 숫자 2 단위로 적용
             let mapWheel = document.getElementById('map');
             mapWheel.addEventListener('wheel', event => {
-                let level = map.getLevel();
-                if (level == 1) 
-                    level = 0;
+                mapLevel = map.getLevel();
+                if (mapLevel == 1) 
+                    mapLevel = 0;
                 let step = 2;
                 let sign = Math.sign(event.deltaY);
 
-                let changeLevel = level + step * sign;
+                let changeLevel = mapLevel + step * sign;
                 map.setLevel(changeLevel);
             });
 
@@ -69,7 +71,7 @@
             // TOPRIGHT는 오른쪽 위를 의미합니다
             map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
 
-            // 초기 지도엔 서울시를 중심으로 시군구 단위로 폴리곤 렌더링
+            // 초기엔 지도 화면 중심으로 시군구 단위로 폴리곤 렌더링
             mapUnit(mapCenter, 'sig');
 
             // 지도에 줌 이벤트가 발생하였을 때
@@ -80,31 +82,30 @@
                 .addListener(map, 'zoom_changed', function () {
                     // 지도의 현재 중심좌표를 얻어옵니다
                     mapCenter = map.getCenter();
-
                     // 지도의 현재 레벨을 얻어옵니다
-                    let level = map.getLevel();
-                    console.log("현재 지도 줌 레벨 값은 :", level);
+                    mapLevel = map.getLevel();
+                    console.log("현재 지도 줌 레벨 값은 :", mapLevel);
 
                     // 레벨이 10 이상인 경우 시도 단위로 폴리곤 렌더링
-                    if (level >= 10) {
+                    if (mapLevel >= 10) {
                         deletePolygon(polygons);
                         deleteMarker(markers);
                         mapUnit(mapCenter, 'ctp');
                     }
                     // 레벨이 8인 경우 시군구 단위로 폴리곤 렌더링
-                    if (level == 8) {
+                    if (mapLevel == 8) {
                         deletePolygon(polygons);
                         deleteMarker(markers);
                         mapUnit(mapCenter, 'sig');
                     }
                     // 레벨이 6 인경우 읍면동 단위로 폴리곤 렌더링
-                    if (level == 6) {
+                    if (mapLevel == 6) {
                         deletePolygon(polygons);
                         deleteMarker(markers);
                         mapUnit(mapCenter, 'emd');
                     }
                     //레벨이 4 인경우 거리 단위 이므로 해당 지역 관련 마커 렌더링
-                    if (level == 4) {
+                    if (mapLevel == 4) {
                         deletePolygon(polygons);
                         deleteMarker(markers);
                     }
@@ -116,10 +117,9 @@
                 .event
                 .addListener(map, 'dragend', function () {
                     mapCenter = map.getCenter();
-                    let level = map.getLevel();
-                    // console.log(mapCenter);
-
-                    if (level != 4) {
+                    mapLevel = map.getLevel();
+                    // console.log(mapCenter); 지도의
+                    if (mapLevel > 4) {
                         deletePolygon(polygons);
                         mapUnit(mapCenter, mapType);
                     }
@@ -332,17 +332,6 @@
                     })
                     .done(function (result) {
                         console.log(result);
-                        // let content = document.createElement('div');
-                        // content.className = 'area';
-                        // content.innerHTML = '<span class="text">' + name +
-                        //         '</span><span class="text2">' + result
-                        //     .data[0]
-                        //     .cnt + '개</span></div>';
-                        // // console.log(content);
-                        // customOverlay.setContent(content);
-                        // customOverlay.setPosition(center);
-                        // customOverlay.setMap(map);
-                        // addEventHandle(content, 'click', onMouseClick(center));
                     });
             }
 
@@ -400,7 +389,8 @@
             //         .maps
             //         .LatLng(x / area, y / area);
             // }
-
+            // .LatLng(x / area, y / area); } 
+            
             // 마커의 인포윈도우를 표시하는 클로저를 만드는 함수입니다
             function makeOverListener(map, marker, infowindow) {
                 return function () {

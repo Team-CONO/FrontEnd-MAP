@@ -147,19 +147,18 @@
                             // console.log(params);
                             let data = params.data;
                             let coordinates = [];
-                            let centers = [];
-                            let name = '';
+                            let getData = [];
                             let getCD = [];
                             $.each(data, function (index, val) {
                                 mapType = val.map_type;
                                 coordinates = val.coordinates;
-                                centers = [val.center_lat, val.center_lot];
-                                name = val.KOR_NM;
+                                getData.push({center: [val.center_lat, val.center_lot], name: val.KOR_NM, cd: val.CD});
                                 getCD.push(val.CD);
-                                // console.log(coordinates, name);
-                                display(coordinates, name, centers);
+                                // console.log(coordinates);
+                                display(coordinates);
                             });
-                            mapCnt(getCD);
+                            // console.log(getData);
+                            mapCnt(getCD, getData);
                         });
                 } else if (map_type == "sig") {
                     $
@@ -181,19 +180,18 @@
                             // console.log(params);
                             let data = params.data;
                             let coordinates = [];
-                            let centers = [];
-                            let name = '';
+                            let getData = [];
                             let getCD = [];
                             $.each(data, function (index, val) {
                                 mapType = val.map_type;
                                 coordinates = val.coordinates;
-                                centers = [val.center_lat, val.center_lot];
-                                name = val.KOR_NM;
+                                getData.push({center: [val.center_lat, val.center_lot], name: val.KOR_NM, cd: val.CD});
                                 getCD.push(val.CD);
-                                // console.log(coordinates, name);
-                                display(coordinates, name, centers);
+                                // console.log(coordinates);
+                                display(coordinates);
                             });
-                            mapCnt(getCD);
+                            // console.log(getData);
+                            mapCnt(getCD, getData);
                         });
                 } else if (map_type == "emd") {
                     $
@@ -215,28 +213,27 @@
                             // console.log(params);
                             let data = params.data;
                             let coordinates = [];
-                            let centers = [];
-                            let name = '';
+                            let getData = [];
                             let getCD = [];
                             $.each(data, function (index, val) {
                                 mapType = val.map_type;
                                 coordinates = val.coordinates;
-                                centers = [val.center_lat, val.center_lot];
-                                name = val.KOR_NM;
+                                getData.push({center: [val.center_lat, val.center_lot], name: val.KOR_NM, cd: val.CD});
                                 getCD.push(val.CD);
-                                // console.log(coordinates, name);
-                                display(coordinates, name, centers);
+                                // console.log(coordinates);
+                                display(coordinates);
                             });
-                            mapCnt(getCD);
+                            // console.log(getData);
+                            mapCnt(getCD, getData);
                         });
                 }
             }
 
             let polygons = []; // 지도 줌 이벤트 시 폴리곤 제거를 위한 배열
             // 폴리곤 렌더링 함수
-            function display(coordinates, name, centers) {
+            function display(coordinates) {
                 let path = [];
-                // console.log(coordinates.length, name, centers);
+                // console.log(coordinates.length);
 
                 $.each(coordinates, function (index, coordinate) {
                     let paths = [];
@@ -274,9 +271,39 @@
                     .addListener(polygon, 'mouseout', function () {
                         polygon.setOptions({fillColor: '#fff'});
                     });
-
-                displayInfo(new kakao.maps.LatLng(centers[0], centers[1]), name);
             };
+
+            // 행정구역 매물 카운트 함수
+            function mapCnt(getCD, getData) {
+                // console.log(getCD);
+                let str = getCD.join(',');
+                $
+                    .ajax({
+                        method: "POST",
+                        dataType: "json",
+                        url: "https://stories282.shop/forsale/map",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            "lat": mapCenter.getLat(),
+                            "lot": mapCenter.getLng(),
+                            "distance": 100,
+                            "geoCDS": str,
+                            "map": mapType,
+                            "page": 0,
+                            "printSize": 10
+                        }),
+                        error: function (e) {
+                            console.log('Error...', e);
+                        }
+                    })
+                    .done(function (result) {
+                        console.log(result);
+                        $.each(getData, function(index, val){
+                            displayInfo(new kakao.maps.LatLng(val.center[0], val.center[1]), val.name)
+                        });
+                    });
+            }
+
             // 행정구역 관련 UI 렌더링 함수
             function displayInfo(center, name) {
                 // console.log(center, name);
@@ -305,33 +332,6 @@
                     .event
                     .addListener(map, 'dragend', function () {
                         customOverlay.setMap(null);
-                    });
-            }
-            // 행정구역 매물 카운트 함수
-            function mapCnt(getCD) {
-                // console.log(getCD);
-                let str = getCD.join(',');
-                $
-                    .ajax({
-                        method: "POST",
-                        dataType: "json",
-                        url: "https://stories282.shop/forsale/map",
-                        contentType: "application/json",
-                        data: JSON.stringify({
-                            "lat": mapCenter.getLat(),
-                            "lot": mapCenter.getLng(),
-                            "distance": 100,
-                            "geoCDS": str,
-                            "map": mapType,
-                            "page": 0,
-                            "printSize": 10
-                        }),
-                        error: function (e) {
-                            console.log('Error...', e);
-                        }
-                    })
-                    .done(function (result) {
-                        console.log(result);
                     });
             }
 

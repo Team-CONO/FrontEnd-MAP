@@ -152,7 +152,13 @@
                             $.each(data, function (index, val) {
                                 mapType = val.map_type;
                                 coordinates = val.coordinates;
-                                getData.push({center: [val.center_lat, val.center_lot], name: val.KOR_NM, cd: val.CD});
+                                getData.push({
+                                    center: [
+                                        val.center_lat, val.center_lot
+                                    ],
+                                    name: val.KOR_NM,
+                                    cd: val.CD
+                                });
                                 getCD.push(val.CD);
                                 // console.log(coordinates);
                                 display(coordinates);
@@ -185,7 +191,13 @@
                             $.each(data, function (index, val) {
                                 mapType = val.map_type;
                                 coordinates = val.coordinates;
-                                getData.push({center: [val.center_lat, val.center_lot], name: val.KOR_NM, cd: val.CD});
+                                getData.push({
+                                    center: [
+                                        val.center_lat, val.center_lot
+                                    ],
+                                    name: val.KOR_NM,
+                                    cd: val.CD
+                                });
                                 getCD.push(val.CD);
                                 // console.log(coordinates);
                                 display(coordinates);
@@ -218,7 +230,13 @@
                             $.each(data, function (index, val) {
                                 mapType = val.map_type;
                                 coordinates = val.coordinates;
-                                getData.push({center: [val.center_lat, val.center_lot], name: val.KOR_NM, cd: val.CD});
+                                getData.push({
+                                    center: [
+                                        val.center_lat, val.center_lot
+                                    ],
+                                    name: val.KOR_NM,
+                                    cd: val.CD
+                                });
                                 getCD.push(val.CD);
                                 // console.log(coordinates);
                                 display(coordinates);
@@ -298,7 +316,7 @@
                     })
                     .done(function (result) {
                         console.log(result);
-                        $.each(getData, function(index, val){
+                        $.each(getData, function (index, val) {
                             displayInfo(new kakao.maps.LatLng(val.center[0], val.center[1]), val.name)
                         });
                     });
@@ -361,37 +379,14 @@
                 }
             }
 
-            // // 폴리곤 중심좌표를 구하는 centroid 알고리즘 함수
-            // function centroid(points) {
-            //     let i,
-            //         j,
-            //         len,
-            //         p1,
-            //         p2,
-            //         f,
-            //         area,
-            //         x,
-            //         y;
-
-            //     area = x = y = 0;
-
-            //     for (i = 0, len = points.length, j = len - 1; i < len; j = i++) {
-            //         p1 = points[i];
-            //         p2 = points[j];
-
-            //         f = p1.y * p2.x - p2.y * p1.x;
-            //         x += (p1.x + p2.x) * f;
-            //         y += (p1.y + p2.y) * f;
-            //         area += f * 3;
-            //     }
-
-            //     return new kakao
-            //         .maps
-            //         .LatLng(x / area, y / area);
-            // }
-            // .LatLng(x / area, y / area); } 
-            
-            // 마커의 인포윈도우를 표시하는 클로저를 만드는 함수입니다
+            // 폴리곤 중심좌표를 구하는 centroid 알고리즘 함수 function centroid(points) {     let i,
+            // j,         len,         p1,         p2,         f,         area,         x,
+            // y;     area = x = y = 0;     for (i = 0, len = points.length, j = len - 1; i
+            // < len; j = i++) {         p1 = points[i];         p2 = points[j];         f =
+            // p1.y * p2.x - p2.y * p1.x;         x += (p1.x + p2.x) * f;         y += (p1.y
+            // + p2.y) * f;         area += f * 3;     }     return new kakao         .maps
+            // .LatLng(x / area, y / area); } .LatLng(x / area, y / area); } 마커의 인포윈도우를 표시하는
+            // 클로저를 만드는 함수입니다
             function makeOverListener(map, marker, infowindow) {
                 return function () {
                     infowindow.open(map, marker);

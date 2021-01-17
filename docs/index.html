@@ -15,19 +15,6 @@
         <div id="map" style="width:100%;height:100vh;"></div>
         <script
             src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2befa4c2ccbf24ac6c3bec24f23abb28"></script>
-        <!--ZOOM 컨트롤 버튼 렌더링-->
-        <div class="custom_zoomcontrol radius_border">
-            <span onclick="zoomIn()">
-                <img
-                    src="https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/ico_plus.png"
-                    alt="확대">
-            </span>
-            <span onclick="zoomOut()">
-                <img
-                    src="https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/ico_minus.png"
-                    alt="축소">
-            </span>
-        </div>
         <script>
             let map = new kakao
                 .maps
@@ -38,9 +25,8 @@
                         .LatLng(37.5642135, 127.0016985), // 초기 지도의 중심좌표
                     level: 8, // 초기 지도의 확대 레벨
                     disableDoubleClickZoom: true, // 지도에 더블클릭 방지
-                    scrollwheel: false // 지도에 스크롤 및 터치에 따른 확대 방지
                 });
-            // console.log("초기 지도 줌 레벨 값은 :", map.getLevel());
+            console.log("초기 지도 줌 레벨 값은 :", map.getLevel());
             // 지도 축소 최대 값 설정
             map.setMaxLevel(12);
             // 지도의 중심좌표 변수
@@ -50,26 +36,19 @@
             // 지도의 줌 레벨 변수
             let mapLevel;
 
-            // 지도에 스크롤 줌 이벤트 값을 각각 숫자 2 단위로 규정
-            let mapWheel = document.getElementById('map');
-            mapWheel.addEventListener('wheel', event => {
-                mapLevel = map.getLevel();
-                if (mapLevel == 1) 
-                    mapLevel = 0;
-                let step = 2;
-                let sign = Math.sign(event.deltaY);
-
-                let changeLevel = mapLevel + step * sign;
-                map.setLevel(changeLevel);
-            });
-
             // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
-            var mapTypeControl = new kakao
+            let mapTypeControl = new kakao
                 .maps
                 .MapTypeControl();
             // 지도에 컨트롤을 추가해야 지도위에 표시됩니다 kakao.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데
             // TOPRIGHT는 오른쪽 위를 의미합니다
             map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+            // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
+            let zoomControl = new kakao
+                .maps
+                .ZoomControl();
+            map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 
             // 초기 지도는 화면 중심으로 시군구 단위로 폴리곤 렌더링
             mapUnit(mapCenter, 'sig');
@@ -84,7 +63,7 @@
                     mapCenter = map.getCenter();
                     // 지도의 현재 줌 레벨값을 얻어옵니다
                     mapLevel = map.getLevel();
-                    // console.log("현재 지도 줌 레벨 값은 :", mapLevel);
+                    console.log("현재 지도 줌 레벨 값은 :", mapLevel);
 
                     // 레벨이 10 이상인 경우 시도 단위로 폴리곤 렌더링
                     if (mapLevel >= 10) {
@@ -92,20 +71,20 @@
                         deleteMarker(markers);
                         mapUnit(mapCenter, 'ctp');
                     }
-                    // 레벨이 8인 경우 시군구 단위로 폴리곤 렌더링
-                    if (mapLevel == 8) {
+                    // 레벨이 7이상 10미만 경우 시군구 단위로 폴리곤 렌더링
+                    if (mapLevel >= 7 && mapLevel < 10) {
                         deletePolygon(polygons);
                         deleteMarker(markers);
                         mapUnit(mapCenter, 'sig');
                     }
-                    // 레벨이 6 인경우 읍면동 단위로 폴리곤 렌더링
-                    if (mapLevel == 6) {
+                    // 레벨이 5이상 7미만 경우 읍면동 단위로 폴리곤 렌더링
+                    if (mapLevel >= 5 && mapLevel < 7) {
                         deletePolygon(polygons);
                         deleteMarker(markers);
                         mapUnit(mapCenter, 'emd');
                     }
-                    //레벨이 4 인경우 거리 단위 이므로 해당 지역 관련 마커 렌더링
-                    if (mapLevel == 4) {
+                    //레벨이 4이하 경우 거리 단위 이므로 해당 지역 관련 마커 렌더링
+                    if (mapLevel <= 4) {
                         deletePolygon(polygons);
                         deleteMarker(markers);
                     }
@@ -177,7 +156,7 @@
                             data: {
                                 lat: mapCenter.getLat(),
                                 lot: mapCenter.getLng(),
-                                distance: '20',
+                                distance: '40',
                                 map: map_type
                             },
                             error: function (e) {
@@ -317,11 +296,10 @@
                         }
                     })
                     .done(function (params) {
-                        console.log(params);
+                        // console.log(params);
                         let arry = [];
                         $.each(params.data, function (index, val) {
-                            // console.log(val);
-                            // 지도의 타입에 따라 해당 매물의 'CD' 값을 구분지어 받음
+                            // console.log(val); 지도의 타입에 따라 해당 매물의 'CD' 값을 구분지어 받음
                             if (mapType == "ctp") {
                                 arry.push({cnt: val.cnt, type: val.addr_CD_1});
                             } else if (mapType == "sig") {
@@ -380,20 +358,7 @@
                         customOverlay.setMap(null);
                     });
             }
-
-            // 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
-            function zoomIn() {
-                map.setLevel(map.getLevel() - 2);
-            }
-            // 지도 확대, 축소 컨트롤에서 축소 버튼을 누르면 호출되어 지도를 축소하는 함수입니다
-            function zoomOut() {
-                if (map.getLevel() == 1) {
-                    map.setLevel(2);
-                } else {
-                    map.setLevel(map.getLevel() + 2);
-                }
-            }
-
+            
             // 지도 줌 이벤트에 따른 기존 폴리곤 제거
             function deletePolygon(polygons) {
                 for (let index = 0; index < polygons.length; index++) {
@@ -430,25 +395,14 @@
             function onMouseClick(center) {
                 return function () {
                     // console.log('click'); 
-                    
                     // UI 클릭 시 지도 줌 이벤트 활성
-                    if (map.getLevel() == 10) {
-                        map.setLevel(map.getLevel() - 4, {
-                            anchor: center,
-                            animate: {
-                                duration: 350
-                            }
-                        });
-                        deletePolygon(polygons);
-                    } else {
-                        map.setLevel(map.getLevel() - 2, {
-                            anchor: center,
-                            animate: {
-                                duration: 350
-                            }
-                        });
-                        deletePolygon(polygons);
-                    }
+                    map.setLevel(map.getLevel() - 2, {
+                        anchor: center,
+                        animate: {
+                            duration: 350
+                        }
+                    });
+                    deletePolygon(polygons);
                 };
             }
             // target node에 이벤트 핸들러를 등록하는 함수힙니다

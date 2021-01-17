@@ -119,6 +119,7 @@
                     mapCenter = map.getCenter();
                     mapLevel = map.getLevel();
 
+                    // 드래그 이벤트로 인한 새로운 지도 모습에 중심좌표를 기점으로 새 폴리곤 및 UI 렌더링
                     if (mapLevel > 4) {
                         deletePolygon(polygons);
                         mapUnit(mapCenter, mapType);
@@ -127,12 +128,13 @@
 
             // 지도 타입에 따른 관리자 페이지 API 'geo' 호출 함수
             function mapUnit(mapCenter, map_type) {
+                // 사용자 지도 화면 중심 좌표와 검색 범위를 API 요청값으로 넘겨 폴리곤 그리고 UI 렌더링 함수에 이용
                 if (map_type == "ctp") {
                     $
                         .ajax({
                             method: "GET",
                             dataType: "json",
-                            url: "https://stories282.shop/geo",
+                            url: "https://foilemap.co.kr/geo",
                             data: {
                                 lat: mapCenter.getLat(),
                                 lot: mapCenter.getLng(),
@@ -171,7 +173,7 @@
                         .ajax({
                             method: "GET",
                             dataType: "json",
-                            url: "https://stories282.shop/geo",
+                            url: "https://foilemap.co.kr/geo",
                             data: {
                                 lat: mapCenter.getLat(),
                                 lot: mapCenter.getLng(),
@@ -210,7 +212,7 @@
                         .ajax({
                             method: "GET",
                             dataType: "json",
-                            url: "https://stories282.shop/geo",
+                            url: "https://foilemap.co.kr/geo",
                             data: {
                                 lat: mapCenter.getLat(),
                                 lot: mapCenter.getLng(),
@@ -291,15 +293,15 @@
                     });
             };
 
-            // 행정구역 매물 카운트 함수
+            // 행정구역 매물 관련 API 'forsale' 호출 함수
             function mapCnt(getCD, getData) {
                 // console.log(getCD);
-                let CDstring = getCD.join(',');
+                let CDstring = getCD.join(','); // CD 배열을 문자열로 변환
                 $
                     .ajax({
                         method: "POST",
                         dataType: "json",
-                        url: "https://stories282.shop/forsale/map",
+                        url: "https://foilemap.co.kr/forsale/map",
                         contentType: "application/json",
                         data: JSON.stringify({
                             "lat": mapCenter.getLat(),
@@ -315,10 +317,11 @@
                         }
                     })
                     .done(function (params) {
-                        // console.log(params);
+                        console.log(params);
                         let arry = [];
                         $.each(params.data, function (index, val) {
                             // console.log(val);
+                            // 지도의 타입에 따라 해당 매물의 'CD' 값을 구분지어 받음
                             if (mapType == "ctp") {
                                 arry.push({cnt: val.cnt, type: val.addr_CD_1});
                             } else if (mapType == "sig") {
@@ -331,6 +334,7 @@
                         $.each(getData, function (index, val) {
                             // console.log(val);
                             arry.forEach(element => {
+                                // 매물 cnt 값이 있으며 현재 렌더링 된 폴리곤 범위에 속한 구역이라면
                                 if (element.type == val.cd) {
                                     displayInfo(
                                         new kakao.maps.LatLng(val.center[0], val.center[1]),
@@ -350,7 +354,7 @@
                 // console.log(center, name);
                 let customOverlay = new kakao
                     .maps
-                    .CustomOverlay({}); // 해당 지역 이름을 표시할 오버레이
+                    .CustomOverlay({}); // 해당 지역 관련 UI를 표시할 오버레이
 
                 let content = document.createElement('div');
                 content.className = 'area';
@@ -362,6 +366,7 @@
                 customOverlay.setMap(map);
                 addEventHandle(content, 'click', onMouseClick(center));
 
+                // 줌 이벤트, 드래그 이벤트가 있을 때 마다 기존의 UI는 제거
                 kakao
                     .maps
                     .event
@@ -389,13 +394,13 @@
                 }
             }
 
-            // 지도 줌 이벤트에 따른 폴리곤 제거
+            // 지도 줌 이벤트에 따른 기존 폴리곤 제거
             function deletePolygon(polygons) {
                 for (let index = 0; index < polygons.length; index++) {
                     polygons[index].setMap(null);
                 }
             }
-            // 지도 줌 이벤트에 따른 마커 제거
+            // 지도 줌 이벤트에 따른 기존 마커 제거
             function deleteMarker(markers) {
                 for (let index = 0; index < markers.length; index++) {
                     markers[index].setMap(null);

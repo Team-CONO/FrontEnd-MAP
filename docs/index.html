@@ -35,6 +35,8 @@
             let mapType;
             // 지도의 줌 레벨 변수
             let mapLevel;
+            // 지도에 렌더링 된 마커 배열
+            let markers = [];
 
             // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
             let mapTypeControl = new kakao
@@ -54,7 +56,6 @@
             mapUnit(mapCenter, 'sig', true);
 
             // 지도에 줌 이벤트가 발생하였을 때
-            let markers = [];
             kakao
                 .maps
                 .event
@@ -104,13 +105,14 @@
                         deletePolygon(polygons);
                         mapUnit(mapCenter, mapType, true);
                     } else {
+                        deleteMarker(markers);
                         mapUnit(mapCenter, 'emd', false);
                     }
                 });
 
             // 지도 타입에 따른 관리자 페이지 API 'geo' 호출 함수
             function mapUnit(mapCenter, map_type, zoomTF) {
-                // 사용자 지도 화면 중심 좌표와 검색 범위를 API 요청값으로 넘겨 폴리곤 그리고 UI 렌더링 함수에 이용
+                // 사용자 지도 화면 중심 좌표와 검색 범위를 API 요청값으로 넘겨 폴리곤 그리고 UI 렌더링 함수에 이용 
                 // 또한, 갑작스런 줌 레벨 변화(ex: ctp -> 거리단위)에 대비해 True/False 문으로 화면 마다의 렌더링 내용을 구분
                 if (map_type == "ctp") {
                     $
@@ -336,6 +338,7 @@
                                 });
                             });
                         } else {
+                            // 거리 단위에 해당되는 내용으로 마커 렌더링과 마커 관련 마우스 이벤트를 구현
                             $.each(params.data, function (index, val) {
                                 // console.log(val);
                                 $
@@ -352,7 +355,44 @@
                                     })
                                     .done(function (result) {
                                         console.log(result);
-                                    })
+                                        markers = $(result.data).map(function (i, position) {
+                                            return new kakao
+                                                .maps
+                                                .Marker({
+                                                    position: new kakao
+                                                        .maps
+                                                        .LatLng(position.lat, position.lot)
+                                                })
+                                        });
+                                        for (let index = 0; index < markers.length; index++) {
+                                            markers[index].setMap(map);
+                                            let infowindow = new kakao
+                                                .maps
+                                                .InfoWindow({
+                                                    content: result
+                                                        .data[index]
+                                                        .houseName // 인포윈도우에 표시할 내용
+                                                });
+                                            // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다 이벤트 리스너로는 클로저를 만들어 등록합니다 for문에서 클로저를
+                                            // 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+                                            kakao
+                                                .maps
+                                                .event
+                                                .addListener(
+                                                    markers[index],
+                                                    'mouseover',
+                                                    makeOverListener(map, markers[index], infowindow)
+                                                );
+                                            kakao
+                                                .maps
+                                                .event
+                                                .addListener(markers[index], 'mouseout', makeOutListener(infowindow));
+                                            kakao
+                                                .maps
+                                                .event
+                                                .addListener(markers[index], 'click', makeClickListener(result.data[index]));
+                                        }
+                                    });
                             });
                         }
                     });
@@ -416,9 +456,9 @@
                 };
             }
             // 마커의 인포윈도우를 클릭하는 클로저를 만드는 함수
-            function makeClickListener(title) {
+            function makeClickListener(info) {
                 return function () {
-                    console.log('클릭된 지점은 ' + title + ' 입니다.');
+                    console.log('클릭된 매물 정보는 : ', info);
                 }
             }
 

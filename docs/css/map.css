@@ -1,4 +1,4 @@
-.area {    
+.area {
     border-radius: 10px;
     border: 1px solid #888;
     cursor: pointer;
@@ -20,7 +20,6 @@
 .area span {
     display: block;
 }
-
 #container {
     overflow: hidden;
     height: 300px;

@@ -28,12 +28,6 @@
             </div>
         </div>
         <script>
-            let overlayOn = false, // 지도 위에 로드뷰 오버레이가 추가된 상태를 가지고 있을 변수
-                container = document.getElementById('container'), // 지도와 로드뷰를 감싸고 있는 div 입니다
-                mapWrapper = document.getElementById('mapWrapper'), // 지도를 감싸고 있는 div 입니다
-                mapContainer = document.getElementById('map'), // 지도를 표시할 div 입니다
-                rvContainer = document.getElementById('roadview'); //로드뷰를 표시할 div 입니다
-
             let map = new kakao
                 .maps
                 .Map(document.getElementById('map'), {
@@ -55,6 +49,12 @@
             let mapLevel;
             // 지도에 렌더링 된 마커 배열
             let markers = [];
+            
+            let overlayOn = false, // 지도 위에 로드뷰 오버레이가 추가된 상태를 가지고 있을 변수
+                container = document.getElementById('container'), // 지도와 로드뷰를 감싸고 있는 div 입니다
+                mapWrapper = document.getElementById('mapWrapper'), // 지도를 감싸고 있는 div 입니다
+                mapContainer = document.getElementById('map'), // 지도를 표시할 div 입니다
+                rvContainer = document.getElementById('roadview'); //로드뷰를 표시할 div 입니다
 
             // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
             let mapTypeControl = new kakao

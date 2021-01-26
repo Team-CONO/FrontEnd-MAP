@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!--jQuery 로드-->
         <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+        <!-- <script src="unicode-csaiur.js"></script> -->
         <!--지도 UI CSS 로드-->
         <link rel="stylesheet" href="css/map.css">
         <title>Korea_Polygon</title>
@@ -28,6 +29,9 @@
             </div>
         </div>
         <script>
+            // let getURL = decodeURIforEUCKR(document.location.href);
+            // console.log(getURL);
+
             let map = new kakao
                 .maps
                 .Map(document.getElementById('map'), {
@@ -306,6 +310,8 @@
             function mapCnt(getCD, getData, zoomTF) {
                 // console.log(getCD);
                 let CDstring = getCD.join(','); // CD 배열을 문자열로 변환
+                // let houseType = getURL.slice(94,getURL.length);
+                // console.log(houseType);
                 $
                     .ajax({
                         method: "POST",
@@ -319,7 +325,8 @@
                             "geoCDS": CDstring,
                             "map": mapType,
                             "page": 0,
-                            "printSize": 10
+                            "printSize": 10,
+                            // "houseType": houseType
                         }),
                         error: function (e) {
                             console.log('Error...', e);

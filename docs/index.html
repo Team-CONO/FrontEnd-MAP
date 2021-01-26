@@ -380,6 +380,7 @@
                                     })
                                     .done(function (result) {
                                         console.log(result);
+                                        // 마커 생성
                                         markers = $(result.data).map(function (i, position) {
                                             return new kakao
                                                 .maps

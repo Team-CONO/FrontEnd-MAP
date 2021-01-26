@@ -483,6 +483,8 @@
             // 마커의 인포윈도우를 클릭하는 클로저를 만드는 함수
             function makeClickListener(info) {
                 return function () {
+                    let myWindow = window.open("");
+                    myWindow.document.write(JSON.stringify(info));
                     console.log('클릭된 매물 정보는 : ', info);
                 }
             }

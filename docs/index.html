@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!--jQuery 로드-->
         <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+        <!-- URL 디코딩 모듈 로드-->
         <!-- <script src="unicode-csaiur.js"></script> -->
         <!--지도 UI CSS 로드-->
         <link rel="stylesheet" href="css/map.css">
@@ -29,7 +30,9 @@
             </div>
         </div>
         <script>
-            // let getURL = decodeURIforEUCKR(document.location.href);
+            // 해당 페이지의 URL 디코딩
+            // console.log(/estate_kind\=([^&?]*)/g.exec(document.URL));
+            // let getURL = decodeURIforEUCKR(/estate_kind\=([^&?]*)/g.exec(document.URL)[1]);
             // console.log(getURL);
 
             let map = new kakao
@@ -310,8 +313,7 @@
             function mapCnt(getCD, getData, zoomTF) {
                 // console.log(getCD);
                 let CDstring = getCD.join(','); // CD 배열을 문자열로 변환
-                // let houseType = getURL.slice(94,getURL.length);
-                // console.log(houseType);
+                // const houseArray = ['아파트','빌라/연립','원룸/투룸']
                 $
                     .ajax({
                         method: "POST",
@@ -326,7 +328,7 @@
                             "map": mapType,
                             "page": 0,
                             "printSize": 10,
-                            // "houseType": houseType
+                            // "houseType": getURL
                         }),
                         error: function (e) {
                             console.log('Error...', e);
@@ -686,6 +688,9 @@
 
                     // 로드뷰 도로 오버레이를 제거합니다
                     toggleOverlay(false);
+
+                    let position = marker.getPosition();
+                    toggleMapWrapper(true, position);
                 }
             }
 

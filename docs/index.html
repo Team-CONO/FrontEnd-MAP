@@ -26,25 +26,24 @@
             </div>
             <div id="mapWrapper">
                 <!-- 지도를 표시할 div 입니다 -->
-                <div id="map" style="width:100%;height:100%"></div>
+                <div id="kakaoMap" style="width:100%;height:100%"></div>
                 <div id="roadviewControl" onclick="setRoadviewRoad()"></div>
             </div>
         </div>
         <script>
-            // 해당 페이지 URL 디코딩
-            // console.log(/estate_kind=([^&?]*)/g.exec(document.URL));
+            // 해당 페이지 URL 
+            // 디코딩 console.log(/estate_kind=([^&?]*)/g.exec(document.URL));
             let getURL;
             if (/estate_kind=([^&?]*)/g.exec(document.URL) != null) {
-                 getURL = decodeURIforEUCKR(/estate_kind=([^&?]*)/g.exec(document.URL)[1]);
-            }
-            else {
-                 getURL = "";
+                getURL = decodeURIforEUCKR(/estate_kind=([^&?]*)/g.exec(document.URL)[1]);
+            } else {
+                getURL = "";
             }
             console.log(getURL);
 
             let map = new kakao
                 .maps
-                .Map(document.getElementById('map'), {
+                .Map(document.getElementById('kakaoMap'), {
                     // 지도를 표시할 div
                     center: new kakao
                         .maps
@@ -136,7 +135,7 @@
                     if (mapLevel > 4) {
                         deletePolygon(polygons);
                         mapUnit(mapCenter, mapType);
-                    } else { 
+                    } else {
                         // 거리 단위 이므로 새 마커 렌더링
                         deleteMarker(markers);
                         mapCnt();
@@ -309,7 +308,7 @@
 
             // 행정구역 매물 관련 괸리자 페이지 API 'forsale' 호출 함수
             function mapCnt(getCD, getData) {
-                console.log(getCD, getData);
+                // console.log(getCD, getData);
                 // 파라미터 값이 없을 경우 즉 현재 지도 줌 레벨이 거리 단위임을 뜻 함
                 if (getCD === undefined && getData === undefined) {
                     $
@@ -332,62 +331,36 @@
                         })
                         .done(function (params) {
                             // console.log(params); 
-                            // 거리 단위에 해당되는 내용으로 관리자 페이지 API 'forsaleHeavy' 호출
+                            // 마커 하나 당 인포 윈도우와 해당 메물 페이지 이동
                             $.each(params.data, function (index, val) {
-                                // console.log(val);
-                                $
-                                    .ajax({
-                                        method: "GET",
-                                        dataType: "json",
-                                        url: "https://foilemap.co.kr/forsaleHeavy/heavy",
-                                        data: {
-                                            hsid: val.hsid
-                                        },
-                                        error: function (e) {
-                                            console.log('Error:', e);
-                                        }
-                                    })
-                                    .done(function (result) {
-                                        console.log(result);
-                                        // 마커 생성
-                                        markers = $(result.data).map(function (i, position) {
-                                            return new kakao
-                                                .maps
-                                                .Marker({
-                                                    position: new kakao
-                                                        .maps
-                                                        .LatLng(position.lat, position.lot)
-                                                })
-                                        });
-                                        for (let index = 0; index < markers.length; index++) {
-                                            markers[index].setMap(map);
-                                            let infowindow = new kakao
-                                                .maps
-                                                .InfoWindow({
-                                                    content: result
-                                                        .data[index]
-                                                        .houseName // 인포윈도우에 표시할 내용
-                                                });
-                                            // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다 이벤트 리스너로는 클로저를 만들어 등록합니다 for문에서 클로저를
-                                            // 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
-                                            kakao
-                                                .maps
-                                                .event
-                                                .addListener(
-                                                    markers[index],
-                                                    'mouseover',
-                                                    makeOverListener(map, markers[index], infowindow)
-                                                );
-                                            kakao
-                                                .maps
-                                                .event
-                                                .addListener(markers[index], 'mouseout', makeOutListener(infowindow));
-                                            kakao
-                                                .maps
-                                                .event
-                                                .addListener(markers[index], 'click', makeClickListener(result.data[index]));
-                                        }
+                                // console.log(val, index);
+                                markers = new kakao
+                                    .maps
+                                    .Marker({
+                                        position: new kakao
+                                            .maps
+                                            .LatLng(val.lat, val.lot)
                                     });
+                                markers.setMap(map);
+
+                                let infowindow = new kakao
+                                    .maps
+                                    .InfoWindow({
+                                        content: val.houseName // 인포윈도우에 표시할 내용
+                                    });
+
+                                kakao
+                                    .maps
+                                    .event
+                                    .addListener(markers, 'mouseover', makeOverListener(map, markers, infowindow));
+                                kakao
+                                    .maps
+                                    .event
+                                    .addListener(markers, 'mouseout', makeOutListener(infowindow));
+                                kakao
+                                    .maps
+                                    .event
+                                    .addListener(markers, 'click', makeClickListener(val.cafe24IDX));
                             });
 
                         });
@@ -503,10 +476,13 @@
                 };
             }
             // 마커의 인포윈도우를 클릭하는 클로저를 만드는 함수
-            function makeClickListener(info) {
+            function makeClickListener(cafe24idx) {
                 return function () {
-                    let myWindow = window.open("http://www.folie.co.kr/bizdemo87846/goods/goods_2.php?type=recomm&mode=view&idx="+info.cafe24IDX);
-                    console.log('클릭된 매물 정보는 : ', info);
+                    window.open(
+                        "http://www.folie.co.kr/bizdemo87846/goods/goods_2.php?type=recomm&mode=view&id" +
+                        "x=" + cafe24idx
+                    );
+                    // console.log('클릭된 매물 정보는 : ', cafe24idx);
                 }
             }
 

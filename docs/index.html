@@ -18,22 +18,29 @@
             src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2befa4c2ccbf24ac6c3bec24f23abb28"></script>
         <div id="container">
             <div id="rvWrapper">
-                <div id="roadview" style="width:100%;height:100%;"></div>
                 <!-- 로드뷰를 표시할 div 입니다 -->
+                <div id="roadview" style="width:100%;height:100%;"></div>
                 <div id="close" title="로드뷰닫기" onclick="closeRoadview()">
-                    <span class="img"></span></div>
+                    <span class="img"></span>
+                </div>
             </div>
             <div id="mapWrapper">
-                <div id="map" style="width:100%;height:100%"></div>
                 <!-- 지도를 표시할 div 입니다 -->
+                <div id="map" style="width:100%;height:100%"></div>
                 <div id="roadviewControl" onclick="setRoadviewRoad()"></div>
             </div>
         </div>
         <script>
-            // 해당 페이지의 URL 디코딩
-            // console.log(/estate_kind\=([^&?]*)/g.exec(document.URL));
-            // let getURL = decodeURIforEUCKR(/estate_kind\=([^&?]*)/g.exec(document.URL)[1]);
-            // console.log(getURL);
+            // 해당 페이지 URL 디코딩
+            // console.log(/estate_kind=([^&?]*)/g.exec(document.URL));
+            let getURL;
+            if (/estate_kind=([^&?]*)/g.exec(document.URL) != null) {
+                 getURL = decodeURIforEUCKR(/estate_kind=([^&?]*)/g.exec(document.URL)[1]);
+            }
+            else {
+                 getURL = "";
+            }
+            console.log(getURL);
 
             let map = new kakao
                 .maps
@@ -56,7 +63,7 @@
             let mapLevel;
             // 지도에 렌더링 된 마커 배열
             let markers = [];
-            
+
             let overlayOn = false, // 지도 위에 로드뷰 오버레이가 추가된 상태를 가지고 있을 변수
                 container = document.getElementById('container'), // 지도와 로드뷰를 감싸고 있는 div 입니다
                 mapWrapper = document.getElementById('mapWrapper'), // 지도를 감싸고 있는 div 입니다
@@ -78,7 +85,7 @@
             map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 
             // 초기 지도는 화면 중심으로 시군구 단위로 폴리곤 렌더링
-            mapUnit(mapCenter, 'sig', true);
+            mapUnit(mapCenter, 'sig');
 
             // 지도에 줌 이벤트가 발생하였을 때
             kakao
@@ -95,25 +102,25 @@
                     if (mapLevel >= 10) {
                         deletePolygon(polygons);
                         deleteMarker(markers);
-                        mapUnit(mapCenter, 'ctp', true);
+                        mapUnit(mapCenter, 'ctp');
                     }
                     // 레벨이 7이상 10미만 경우 시군구 단위로 폴리곤 렌더링
                     if (mapLevel >= 7 && mapLevel < 10) {
                         deletePolygon(polygons);
                         deleteMarker(markers);
-                        mapUnit(mapCenter, 'sig', true);
+                        mapUnit(mapCenter, 'sig');
                     }
                     // 레벨이 5이상 7미만 경우 읍면동 단위로 폴리곤 렌더링
                     if (mapLevel >= 5 && mapLevel < 7) {
                         deletePolygon(polygons);
                         deleteMarker(markers);
-                        mapUnit(mapCenter, 'emd', true);
+                        mapUnit(mapCenter, 'emd');
                     }
                     //레벨이 4이하 경우 거리 단위 이므로 해당 지역 관련 마커 렌더링
                     if (mapLevel <= 4) {
                         deletePolygon(polygons);
                         deleteMarker(markers);
-                        mapUnit(mapCenter, 'emd', false);
+                        mapCnt();
                     }
                 });
 
@@ -128,17 +135,17 @@
                     // 드래그 이벤트로 인한 새로운 지도 모습에 중심좌표를 기점으로 새 폴리곤 및 UI 렌더링
                     if (mapLevel > 4) {
                         deletePolygon(polygons);
-                        mapUnit(mapCenter, mapType, true);
-                    } else {
+                        mapUnit(mapCenter, mapType);
+                    } else { 
+                        // 거리 단위 이므로 새 마커 렌더링
                         deleteMarker(markers);
-                        mapUnit(mapCenter, 'emd', false);
+                        mapCnt();
                     }
                 });
 
             // 지도 타입에 따른 관리자 페이지 API 'geo' 호출 함수
-            function mapUnit(mapCenter, map_type, zoomTF) {
-                // 사용자 지도 화면 중심 좌표와 검색 범위를 API 요청값으로 넘겨 폴리곤 그리고 UI 렌더링 함수에 이용 또한, 갑작스런 줌 레벨
-                // 변화(ex: ctp -> 거리단위)에 대비해 True/False 문으로 화면 마다의 렌더링 내용을 구분
+            function mapUnit(map_center, map_type) {
+                // 사용자 지도 화면 중심 좌표와 검색 범위를 해당 API 요청값으로 넘겨 폴리곤 그리고 UI 렌더링 함수에 이용
                 if (map_type == "ctp") {
                     $
                         .ajax({
@@ -146,8 +153,8 @@
                             dataType: "json",
                             url: "https://foilemap.co.kr/geo",
                             data: {
-                                lat: mapCenter.getLat(),
-                                lot: mapCenter.getLng(),
+                                lat: map_center.getLat(),
+                                lot: map_center.getLng(),
                                 distance: '200',
                                 map: map_type
                             },
@@ -173,12 +180,9 @@
                                 });
                                 getCD.push(val.CD);
                                 // console.log(coordinates);
-                                if (zoomTF) {
-                                    display(coordinates);
-                                }
+                                display(coordinates);
                             });
-                            // console.log(getData);
-                            mapCnt(getCD, getData, zoomTF);
+                            mapCnt(getCD, getData);
                         });
                 } else if (map_type == "sig") {
                     $
@@ -187,8 +191,8 @@
                             dataType: "json",
                             url: "https://foilemap.co.kr/geo",
                             data: {
-                                lat: mapCenter.getLat(),
-                                lot: mapCenter.getLng(),
+                                lat: map_center.getLat(),
+                                lot: map_center.getLng(),
                                 distance: '40',
                                 map: map_type
                             },
@@ -214,12 +218,9 @@
                                 });
                                 getCD.push(val.CD);
                                 // console.log(coordinates);
-                                if (zoomTF) {
-                                    display(coordinates);
-                                }
+                                display(coordinates);
                             });
-                            // console.log(getData);
-                            mapCnt(getCD, getData, zoomTF);
+                            mapCnt(getCD, getData);
                         });
                 } else if (map_type == "emd") {
                     $
@@ -228,8 +229,8 @@
                             dataType: "json",
                             url: "https://foilemap.co.kr/geo",
                             data: {
-                                lat: mapCenter.getLat(),
-                                lot: mapCenter.getLng(),
+                                lat: map_center.getLat(),
+                                lot: map_center.getLng(),
                                 distance: '5',
                                 map: map_type
                             },
@@ -255,12 +256,9 @@
                                 });
                                 getCD.push(val.CD);
                                 // console.log(coordinates);
-                                if (zoomTF) {
-                                    display(coordinates);
-                                }
+                                display(coordinates);
                             });
-                            // console.log(getData);
-                            mapCnt(getCD, getData, zoomTF);
+                            mapCnt(getCD, getData);
                         });
                 }
             }
@@ -310,60 +308,30 @@
             };
 
             // 행정구역 매물 관련 괸리자 페이지 API 'forsale' 호출 함수
-            function mapCnt(getCD, getData, zoomTF) {
-                // console.log(getCD);
-                let CDstring = getCD.join(','); // CD 배열을 문자열로 변환
-                $
-                    .ajax({
-                        method: "POST",
-                        dataType: "json",
-                        url: "https://foilemap.co.kr/forsale/map",
-                        contentType: "application/json",
-                        data: JSON.stringify({
-                            "lat": mapCenter.getLat(),
-                            "lot": mapCenter.getLng(),
-                            "distance": 1000,
-                            "geoCDS": CDstring,
-                            "map": mapType,
-                            "page": 0,
-                            "printSize": 10,
-                            // "houseType": getURL
-                        }),
-                        error: function (e) {
-                            console.log('Error...', e);
-                        }
-                    })
-                    .done(function (params) {
-                        // console.log(params);
-                        if (zoomTF) {
-                            let arry = [];
-                            $.each(params.data, function (index, val) {
-                                // console.log(val); 지도의 타입에 따라 해당 매물의 'CD' 값을 구분지어 받음
-                                if (mapType == "ctp") {
-                                    arry.push({cnt: val.cnt, type: val.addr_CD_1});
-                                } else if (mapType == "sig") {
-                                    arry.push({cnt: val.cnt, type: val.addr_CD_2});
-                                } else if (mapType == "emd") {
-                                    arry.push({cnt: val.cnt, type: val.addr_CD_3});
-                                }
-                            });
-
-                            $.each(getData, function (index, val) {
-                                // console.log(val);
-                                arry.forEach(element => {
-                                    // 매물 cnt 값이 있으며 현재 렌더링 된 폴리곤 범위에 속한 구역이라면
-                                    if (element.type == val.cd) {
-                                        displayInfo(
-                                            new kakao.maps.LatLng(val.center[0], val.center[1]),
-                                            val.name,
-                                            element.cnt
-                                        );
-                                    } else {
-                                        displayInfo(new kakao.maps.LatLng(val.center[0], val.center[1]), val.name, 0)
-                                    }
-                                });
-                            });
-                        } else {
+            function mapCnt(getCD, getData) {
+                console.log(getCD, getData);
+                // 파라미터 값이 없을 경우 즉 현재 지도 줌 레벨이 거리 단위임을 뜻 함
+                if (getCD === undefined && getData === undefined) {
+                    $
+                        .ajax({
+                            method: "POST",
+                            dataType: "json",
+                            url: "https://foilemap.co.kr/forsale/map",
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                "lat": mapCenter.getLat(),
+                                "lot": mapCenter.getLng(),
+                                "distance": 10,
+                                "page": 0,
+                                "printSize": 987654321,
+                                "houseType": getURL
+                            }),
+                            error: function (e) {
+                                console.log('Error...', e);
+                            }
+                        })
+                        .done(function (params) {
+                            // console.log(params); 
                             // 거리 단위에 해당되는 내용으로 관리자 페이지 API 'forsaleHeavy' 호출
                             $.each(params.data, function (index, val) {
                                 // console.log(val);
@@ -421,13 +389,65 @@
                                         }
                                     });
                             });
-                        }
-                    });
+
+                        });
+                } else {
+                    let CDstring = getCD.join(','); // CD 배열을 문자열로 변환
+                    $
+                        .ajax({
+                            method: "POST",
+                            dataType: "json",
+                            url: "https://foilemap.co.kr/forsale/map",
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                "lat": mapCenter.getLat(),
+                                "lot": mapCenter.getLng(),
+                                "distance": 1000,
+                                "geoCDS": CDstring,
+                                "map": mapType,
+                                "page": 0,
+                                "printSize": 987654321,
+                                "houseType": getURL
+                            }),
+                            error: function (e) {
+                                console.log('Error...', e);
+                            }
+                        })
+                        .done(function (params) {
+                            // console.log(params);
+                            let arry = [];
+                            $.each(params.data, function (index, val) {
+                                // console.log(val); 지도의 타입에 따라 해당 매물의 'CD' 값을 구분지어 받음
+                                if (mapType == "ctp") {
+                                    arry.push({cnt: val.cnt, type: val.addr_CD_1});
+                                } else if (mapType == "sig") {
+                                    arry.push({cnt: val.cnt, type: val.addr_CD_2});
+                                } else if (mapType == "emd") {
+                                    arry.push({cnt: val.cnt, type: val.addr_CD_3});
+                                }
+                            });
+                            $.each(getData, function (index, val) {
+                                // console.log(val);
+                                arry.forEach(element => {
+                                    // 매물 cnt 값이 있으며 현재 렌더링 된 폴리곤 범위에 속한 구역이라면
+                                    if (element.type == val.cd) {
+                                        displayInfo(
+                                            new kakao.maps.LatLng(val.center[0], val.center[1]),
+                                            val.name,
+                                            element.cnt
+                                        );
+                                    } else {
+                                        displayInfo(new kakao.maps.LatLng(val.center[0], val.center[1]), val.name, 0)
+                                    }
+                                });
+                            });
+                        });
+                }
             }
 
             // 행정구역 UI 렌더링 함수
             function displayInfo(center, name, cnt) {
-                // console.log(center, name);
+                // console.log(center, name, cnt);
                 let customOverlay = new kakao
                     .maps
                     .CustomOverlay({}); // 해당 지역 관련 UI를 표시할 오버레이
@@ -485,8 +505,7 @@
             // 마커의 인포윈도우를 클릭하는 클로저를 만드는 함수
             function makeClickListener(info) {
                 return function () {
-                    let myWindow = window.open("");
-                    myWindow.document.write(JSON.stringify(info));
+                    let myWindow = window.open("http://www.folie.co.kr/bizdemo87846/goods/goods_2.php?type=recomm&mode=view&idx="+info.cafe24IDX);
                     console.log('클릭된 매물 정보는 : ', info);
                 }
             }
@@ -528,13 +547,10 @@
                 .maps
                 .event
                 .addListener(rv, 'position_changed', function () {
-
                     // 현재 로드뷰의 위치 좌표를 얻어옵니다
                     let rvPosition = rv.getPosition();
-
                     // 지도의 중심을 현재 로드뷰의 위치로 설정합니다
                     map.setCenter(rvPosition);
-
                     // 지도 위에 로드뷰 도로 오버레이가 추가된 상태이면
                     if (overlayOn) {
                         // 마커의 위치를 현재 로드뷰의 위치로 설정합니다
@@ -574,10 +590,8 @@
                 .maps
                 .event
                 .addListener(marker, 'dragend', function (mouseEvent) {
-
                     // 현재 마커가 놓인 자리의 좌표입니다
                     let position = marker.getPosition();
-
                     // 마커가 놓인 위치를 기준으로 로드뷰를 설정합니다
                     toggleRoadview(position);
                 });
@@ -587,18 +601,14 @@
                 .maps
                 .event
                 .addListener(map, 'click', function (mouseEvent) {
-
                     // 지도 위에 로드뷰 도로 오버레이가 추가된 상태가 아니면 클릭이벤트를 무시합니다
                     if (!overlayOn) {
                         return;
                     }
-
                     // 클릭한 위치의 좌표입니다
                     let position = mouseEvent.latLng;
-
                     // 마커를 클릭한 위치로 옮깁니다
                     marker.setPosition(position);
-
                     // 클락한 위치를 기준으로 로드뷰를 설정합니다
                     toggleRoadview(position);
                 });
@@ -611,7 +621,6 @@
                         toggleMapWrapper(true, position);
                     } else {
                         toggleMapWrapper(false, position);
-
                         // panoId로 로드뷰를 설정합니다
                         rv.setPanoId(panoId, position);
                     }
@@ -621,24 +630,18 @@
             // 지도를 감싸고 있는 div의 크기를 조정하는 함수입니다
             function toggleMapWrapper(active, position) {
                 if (active) {
-
                     // 지도를 감싸고 있는 div의 너비가 100%가 되도록 class를 변경합니다
                     container.className = '';
-
                     // 지도의 크기가 변경되었기 때문에 relayout 함수를 호출합니다
                     map.relayout();
-
                     // 지도의 너비가 변경될 때 지도중심을 입력받은 위치(position)로 설정합니다
                     map.setCenter(position);
                 } else {
-
                     // 지도만 보여지고 있는 상태이면 지도의 너비가 50%가 되도록 class를 변경하여 로드뷰가 함께 표시되게 합니다
                     if (container.className.indexOf('view_roadview') === -1) {
                         container.className = 'view_roadview';
-
                         // 지도의 크기가 변경되었기 때문에 relayout 함수를 호출합니다
                         map.relayout();
-
                         // 지도의 너비가 변경될 때 지도중심을 입력받은 위치(position)로 설정합니다
                         map.setCenter(position);
                     }
@@ -649,24 +652,18 @@
             function toggleOverlay(active) {
                 if (active) {
                     overlayOn = true;
-
                     // 지도 위에 로드뷰 도로 오버레이를 추가합니다
                     map.addOverlayMapTypeId(kakao.maps.MapTypeId.ROADVIEW);
-
                     // 지도 위에 마커를 표시합니다
                     marker.setMap(map);
-
                     // 마커의 위치를 지도 중심으로 설정합니다
                     marker.setPosition(map.getCenter());
-
                     // 로드뷰의 위치를 지도 중심으로 설정합니다
                     toggleRoadview(map.getCenter());
                 } else {
                     overlayOn = false;
-
                     // 지도 위의 로드뷰 도로 오버레이를 제거합니다
                     map.removeOverlayMapTypeId(kakao.maps.MapTypeId.ROADVIEW);
-
                     // 지도 위의 마커를 제거합니다
                     marker.setMap(null);
                 }
@@ -675,19 +672,15 @@
             // 지도 위의 로드뷰 버튼을 눌렀을 때 호출되는 함수입니다
             function setRoadviewRoad() {
                 let control = document.getElementById('roadviewControl');
-
                 // 버튼이 눌린 상태가 아니면
                 if (control.className.indexOf('active') === -1) {
                     control.className = 'active';
-
                     // 로드뷰 도로 오버레이가 보이게 합니다
                     toggleOverlay(true);
                 } else {
                     control.className = '';
-
                     // 로드뷰 도로 오버레이를 제거합니다
                     toggleOverlay(false);
-
                     let position = marker.getPosition();
                     toggleMapWrapper(true, position);
                 }

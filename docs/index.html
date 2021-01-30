@@ -31,8 +31,8 @@
             </div>
         </div>
         <script>
-            // 해당 페이지 URL 
-            // 디코딩 console.log(/estate_kind=([^&?]*)/g.exec(document.URL));
+            // 해당 페이지 URL 디코딩
+            // console.log(/estate_kind=([^&?]*)/g.exec(document.URL));
             let getURL;
             if (/estate_kind=([^&?]*)/g.exec(document.URL) != null) {
                 getURL = decodeURIforEUCKR(/estate_kind=([^&?]*)/g.exec(document.URL)[1]);

@@ -60,8 +60,6 @@
             let mapType;
             // 지도의 줌 레벨 변수
             let mapLevel;
-            // 지도에 렌더링 된 마커 배열
-            let markers = [];
 
             let overlayOn = false, // 지도 위에 로드뷰 오버레이가 추가된 상태를 가지고 있을 변수
                 container = document.getElementById('container'), // 지도와 로드뷰를 감싸고 있는 div 입니다
@@ -100,25 +98,21 @@
                     // 레벨이 10 이상인 경우 시도 단위로 폴리곤 렌더링
                     if (mapLevel >= 10) {
                         deletePolygon(polygons);
-                        deleteMarker(markers);
                         mapUnit(mapCenter, 'ctp');
                     }
                     // 레벨이 7이상 10미만 경우 시군구 단위로 폴리곤 렌더링
                     if (mapLevel >= 7 && mapLevel < 10) {
                         deletePolygon(polygons);
-                        deleteMarker(markers);
                         mapUnit(mapCenter, 'sig');
                     }
                     // 레벨이 5이상 7미만 경우 읍면동 단위로 폴리곤 렌더링
                     if (mapLevel >= 5 && mapLevel < 7) {
                         deletePolygon(polygons);
-                        deleteMarker(markers);
                         mapUnit(mapCenter, 'emd');
                     }
                     //레벨이 4이하 경우 거리 단위 이므로 해당 지역 관련 마커 렌더링
                     if (mapLevel <= 4) {
                         deletePolygon(polygons);
-                        deleteMarker(markers);
                         mapCnt();
                     }
                 });
@@ -137,7 +131,6 @@
                         mapUnit(mapCenter, mapType);
                     } else {
                         // 거리 단위 이므로 새 마커 렌더링
-                        deleteMarker(markers);
                         mapCnt();
                     }
                 });
@@ -320,7 +313,7 @@
                             data: JSON.stringify({
                                 "lat": mapCenter.getLat(),
                                 "lot": mapCenter.getLng(),
-                                "distance": 10,
+                                "distance": 3,
                                 "page": 0,
                                 "printSize": 987654321,
                                 "houseType": getURL
@@ -330,11 +323,11 @@
                             }
                         })
                         .done(function (params) {
-                            // console.log(params); 
+                            console.log(params);
                             // 마커 하나 당 인포 윈도우와 클릭 시 해당 메물 페이지로 이동
                             $.each(params.data, function (index, val) {
                                 // console.log(val, index);
-                                markers = new kakao
+                                let markers = new kakao
                                     .maps
                                     .Marker({
                                         position: new kakao
@@ -348,7 +341,7 @@
                                     .InfoWindow({
                                         content: val.houseName // 인포윈도우에 표시할 내용
                                     });
-
+                                // 다양한 마커 관련 마우스 이벤트 함수 클로저
                                 kakao
                                     .maps
                                     .event
@@ -361,11 +354,26 @@
                                     .maps
                                     .event
                                     .addListener(markers, 'click', makeClickListener(val.cafe24IDX));
+
+                                // 지도에 줌, 드래그 이벤트 시 기존 마커는 제거
+                                kakao
+                                    .maps
+                                    .event
+                                    .addListener(map, 'zoom_changed', function () {
+                                        markers.setMap(null);
+                                    });
+                                kakao
+                                    .maps
+                                    .event
+                                    .addListener(map, 'dragend', function () {
+                                        markers.setMap(null);
+                                    });
                             });
 
                         });
                 } else {
                     let CDstring = getCD.join(','); // CD 배열을 문자열로 변환
+                    // 지도 타입별로 파라미터 값들을 주어 해당 행정구역의 이름과 매물 갯수를 UI에 출력
                     if (mapType == 'ctp') {
                         $
                             .ajax({
@@ -521,12 +529,6 @@
             function deletePolygon(polygons) {
                 for (let index = 0; index < polygons.length; index++) {
                     polygons[index].setMap(null);
-                }
-            }
-            // 지도 줌 이벤트에 따른 기존 마커 제거
-            function deleteMarker(markers) {
-                for (let index = 0; index < markers.length; index++) {
-                    markers[index].setMap(null);
                 }
             }
 

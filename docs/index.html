@@ -34,9 +34,7 @@
             // 해당 페이지 URL 디코딩
             let getURL = document.URL;
             let getStr = [];
-
             regexp = /(\%[[0-9A-F]{2}]*)/g;
-
             array = [...getURL.matchAll(regexp)].map(i => i[0].replace('%', '0x'));
             stack = [];
             decArray = [];
@@ -70,7 +68,6 @@
             let typeString = getStr.join('');
             // console.log(typeString);
 
-
             let map = new kakao
                 .maps
                 .Map(document.getElementById('kakaoMap'), {
@@ -90,7 +87,6 @@
             let mapType;
             // 지도의 줌 레벨 변수
             let mapLevel;
-
             let overlayOn = false, // 지도 위에 로드뷰 오버레이가 추가된 상태를 가지고 있을 변수
                 container = document.getElementById('container'), // 지도와 로드뷰를 감싸고 있는 div 입니다
                 mapWrapper = document.getElementById('mapWrapper'), // 지도를 감싸고 있는 div 입니다
@@ -165,7 +161,7 @@
                     }
                 });
 
-            // 지도 타입에 따른 관리자 페이지 API 'geo' 호출 함수
+            // 지도 단위에 따른 관리자 페이지 API 'geo' 호출 함수
             function mapUnit(map_center, map_type) {
                 // 사용자 지도 화면 중심 좌표와 검색 범위를 해당 API 요청값으로 넘겨 폴리곤 그리고 UI 렌더링 함수에 이용
                 if (map_type == "ctp") {
@@ -331,7 +327,8 @@
 
             // 행정구역 매물 관련 괸리자 페이지 API 'forsale' 호출 함수
             function mapCnt(getCD, getData) {
-                // console.log(getCD, getData); 파라미터 값이 없을 경우 즉 현재 지도 줌 레벨이 거리 단위임을 뜻 함
+                // console.log(getCD, getData); 
+                // 파라미터 값이 없을 경우 즉 현재 지도 줌 레벨이 거리 단위임을 뜻 함
                 if (getCD === undefined && getData === undefined) {
                     $
                         .ajax({
@@ -352,7 +349,7 @@
                             }
                         })
                         .done(function (params) {
-                            console.log(params);
+                            // console.log(params);
                             // 마커 하나 당 인포 윈도우와 클릭 시 해당 메물 페이지로 이동
                             $.each(params.data, function (index, val) {
                                 // console.log(val, index);
@@ -402,7 +399,7 @@
                         });
                 } else {
                     let CDstring = getCD.join(','); // CD 배열을 문자열로 변환
-                    // 지도 타입별로 파라미터 값들을 주어 해당 행정구역의 이름과 매물 갯수를 UI에 출력
+                    // 지도 단위별로 파라미터 값들을 주어 해당 행정구역의 이름과 매물 갯수를 UI에 출력
                     if (mapType == 'ctp') {
                         $
                             .ajax({

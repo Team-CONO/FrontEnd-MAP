@@ -551,7 +551,7 @@
                     });
             }
 
-            // 지도 줌 이벤트에 따른 기존 폴리곤 제거
+            // 지도 줌, 드래그 이벤트에 따른 기존 폴리곤 제거
             function deletePolygon(polygons) {
                 for (let index = 0; index < polygons.length; index++) {
                     polygons[index].setMap(null);

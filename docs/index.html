@@ -73,13 +73,23 @@
             let typeString = getStr.join('');
             // console.log(typeString);
 
+            // 마지막으로 조회된 지도 위치 (로컬 스토리지를 이용)
+            let lat, lot;
+            if (!localStorage.getItem('lat') && !localStorage.getItem('lot')) {
+                lat = 37.5642135
+                lot = 127.0016985
+            } else {
+                lat = localStorage.getItem('lat');
+                lot = localStorage.getItem('lot');
+            }
+
             let map = new kakao
                 .maps
                 .Map(document.getElementById('kakaoMap'), {
                     // 지도를 표시할 div
                     center: new kakao
                         .maps
-                        .LatLng(37.5642135, 127.0016985), // 초기 지도의 중심좌표
+                        .LatLng(lat, lot), // 초기 지도의 중심좌표
                     level: 8, // 초기 지도의 확대 레벨
                     disableDoubleClickZoom: true, // 지도에 더블클릭 방지
                 });
@@ -111,6 +121,9 @@
                     // 지도의 현재 줌 레벨값을 얻어옵니다
                     mapLevel = map.getLevel();
                     console.log("현재 지도 줌 레벨 값은 :", mapLevel);
+                    // 마지막 위치 값 저장
+                    localStorage.setItem('lat', mapCenter.getLat());
+                    localStorage.setItem('lot', mapCenter.getLng());
 
                     // 레벨이 10 이상인 경우 시도 단위로 폴리곤 렌더링
                     if (mapLevel >= 10) {
@@ -141,6 +154,9 @@
                 .addListener(map, 'dragend', function () {
                     mapCenter = map.getCenter();
                     mapLevel = map.getLevel();
+                    // 마지막 위치 값 저장
+                    localStorage.setItem('lat', mapCenter.getLat());
+                    localStorage.setItem('lot', mapCenter.getLng());
 
                     // 드래그 이벤트로 인한 새로운 지도 모습에 중심좌표를 기점으로 새 폴리곤 및 UI 렌더링
                     if (mapLevel > 4) {

@@ -624,6 +624,11 @@
                 localStorage.setItem('lot', lot);
 
                 map.setCenter(new kakao.maps.LatLng(lat, lot));
+                mapCenter = map.getCenter();
+                mapLevel = 8;
+                map.setLevel(mapLevel);
+                deletePolygon(polygons);
+                mapUnit(mapCenter, 'sig');
             }
 
             // 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다

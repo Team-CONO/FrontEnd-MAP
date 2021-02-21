@@ -94,6 +94,8 @@
                     disableDoubleClickZoom: true, // 지도에 더블클릭 방지
                 });
             console.log("초기 지도 줌 레벨 값은 :", map.getLevel());
+            // 지도 스크롤 줌 액션 잠금
+            map.setZoomable(false);
             // 지도 축소 최대 값 설정
             map.setMaxLevel(12);
             // 지도의 중심좌표 변수
@@ -130,13 +132,13 @@
                         deletePolygon(polygons);
                         mapUnit(mapCenter, 'ctp');
                     }
-                    // 레벨이 7이상 10미만 경우 시군구 단위로 폴리곤 렌더링
-                    if (mapLevel >= 7 && mapLevel < 10) {
+                    // 레벨이 8이상 10미만 경우 시군구 단위로 폴리곤 렌더링
+                    if (mapLevel >= 8 && mapLevel < 10) {
                         deletePolygon(polygons);
                         mapUnit(mapCenter, 'sig');
                     }
-                    // 레벨이 5이상 7미만 경우 읍면동 단위로 폴리곤 렌더링
-                    if (mapLevel >= 5 && mapLevel < 7) {
+                    // 레벨이 6이상 8미만 경우 읍면동 단위로 폴리곤 렌더링
+                    if (mapLevel >= 6 && mapLevel < 8) {
                         deletePolygon(polygons);
                         mapUnit(mapCenter, 'emd');
                     }
@@ -612,12 +614,16 @@
 
             // 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
             function zoomIn() {
-                map.setLevel(map.getLevel() - 1);
+                map.setLevel(map.getLevel() - 2);
             }
 
             // 지도 확대, 축소 컨트롤에서 축소 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
             function zoomOut() {
-                map.setLevel(map.getLevel() + 1);
+                if (mapLevel == 1) {
+                    map.setLevel(2);
+                } else {
+                    map.setLevel(map.getLevel() + 2);
+                }
             }
 
             // 로드뷰 객체를 생성합니다

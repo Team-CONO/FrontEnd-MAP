@@ -74,7 +74,7 @@
     position: absolute;
     cursor: pointer;
     z-index: 2;
-    top: 5px;
+    top: 10px;
     right: 3px;
     width: 42px;
     height: 42px;
@@ -130,9 +130,6 @@
     padding: 12px 0;
     border: none;
 }
-/* .custom_zoomcontrol span:first-child {
-    border-bottom: 1px solid #bfbfbf;
-} */
 .custom_zoomcontrol_plus:active {
     background-color: rgb(102, 102, 102);
 }

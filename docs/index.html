@@ -17,16 +17,17 @@
         <script
             src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2befa4c2ccbf24ac6c3bec24f23abb28"></script>
         <div id="container">
+            <!-- 로드뷰를 표시할 div 입니다 -->
             <div id="rvWrapper">
-                <!-- 로드뷰를 표시할 div 입니다 -->
                 <div id="roadview" style="width:100%;height:100%;"></div>
                 <div id="close" title="로드뷰닫기" onclick="closeRoadview()">
                     <span class="img"></span>
                 </div>
             </div>
+            <!-- 지도 위치를 초기화할 div 입니다-->
             <div id="resetControl" onclick="reset()"></div>
+            <!-- 지도를 표시할 div 입니다 -->
             <div id="mapWrapper">
-                <!-- 지도를 표시할 div 입니다 -->
                 <div id="kakaoMap" style="width:100%;height:100%"></div>
                 <div id="roadviewControl" onclick="setRoadviewRoad()"></div>
                 <!-- 지도 확대, 축소 컨트롤 div 입니다 -->
@@ -622,7 +623,7 @@
                 localStorage.setItem('lat', lat);
                 localStorage.setItem('lot', lot);
 
-                window.location.reload();
+                map.setCenter(new kakao.maps.LatLng(lat, lot));
             }
 
             // 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다

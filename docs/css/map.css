@@ -70,9 +70,78 @@
         width: 50%;
     }
 }
+#resetControl {
+    position: absolute;
+    cursor: pointer;
+    z-index: 2;
+    top: 5px;
+    right: 3px;
+    width: 42px;
+    height: 42px;
+    background: url("//t1.daumcdn.net/localimg/localimages/07/2018/pc/common/img_search.png") no-repeat -150px -450px;
+}
+.radius_border {
+    border: 1px solid #919191;
+    border-radius: 5px;
+}
+.custom_zoomcontrol_plus {
+    position: absolute;
+    top: 50px;
+    right: 7px;
+    width: 36px;
+    height: 40px;
+    overflow: hidden;
+    z-index: 1;
+    background-color: #f5f5f5;
+}
+.custom_zoomcontrol_plus span {
+    display: block;
+    width: 36px;
+    height: 40px;
+    text-align: center;
+    cursor: pointer;
+}
+.custom_zoomcontrol_plus span img {
+    width: 15px;
+    height: 15px;
+    padding: 12px 0;
+    border: none;
+}
+.custom_zoomcontrol_minus {
+    position: absolute;
+    top: 100px;
+    right: 7px;
+    width: 36px;
+    height: 40px;
+    overflow: hidden;
+    z-index: 1;
+    background-color: #f5f5f5;
+}
+.custom_zoomcontrol_minus span {
+    display: block;
+    width: 36px;
+    height: 40px;
+    text-align: center;
+    cursor: pointer;
+}
+.custom_zoomcontrol_minus span img {
+    width: 15px;
+    height: 15px;
+    padding: 12px 0;
+    border: none;
+}
+/* .custom_zoomcontrol span:first-child {
+    border-bottom: 1px solid #bfbfbf;
+} */
+.custom_zoomcontrol_plus:active {
+    background-color: rgb(102, 102, 102);
+}
+.custom_zoomcontrol_minus:active {
+    background-color: rgb(102, 102, 102);
+}
 #roadviewControl {
     position: absolute;
-    top: 5px;
+    top: 150px;
     right: 5px;
     width: 42px;
     height: 42px;
@@ -82,7 +151,6 @@
 }
 #roadviewControl.active {
     background-position: 0 -350px;
-    left: 5px;
 }
 #close {
     position: absolute;
@@ -100,34 +168,4 @@
     background: url("https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/rv_close.png") no-repeat;
     width: 14px;
     height: 14px;
-}
-.radius_border {
-    border: 1px solid #919191;
-    border-radius: 5px;
-}
-.custom_zoomcontrol {
-    position: absolute;
-    top: 50px;
-    right: 7px;
-    width: 36px;
-    height: 80px;
-    overflow: hidden;
-    z-index: 1;
-    background-color: #f5f5f5;
-}
-.custom_zoomcontrol span {
-    display: block;
-    width: 36px;
-    height: 40px;
-    text-align: center;
-    cursor: pointer;
-}
-.custom_zoomcontrol span img {
-    width: 15px;
-    height: 15px;
-    padding: 12px 0;
-    border: none;
-}
-.custom_zoomcontrol span:first-child {
-    border-bottom: 1px solid #bfbfbf;
 }

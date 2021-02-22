@@ -76,75 +76,55 @@
     z-index: 2;
     top: 10px;
     right: 3px;
-    width: 42px;
-    height: 42px;
-    background: url("//t1.daumcdn.net/localimg/localimages/07/2018/pc/common/img_search.png") no-repeat -150px -450px;
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
 }
-.radius_border {
-    border: 1px solid #919191;
-    border-radius: 5px;
+#resetControl .resetTooltip {
+    visibility: visible;
 }
-.custom_zoomcontrol_plus {
+#resetControl:hover .resetTooltip {
+    visibility: visible;
+}
+#custom_zoomcontrol_plus {
     position: absolute;
-    top: 50px;
-    right: 7px;
-    width: 36px;
-    height: 40px;
-    overflow: hidden;
-    z-index: 1;
-    background-color: #f5f5f5;
-}
-.custom_zoomcontrol_plus span {
-    display: block;
-    width: 36px;
-    height: 40px;
-    text-align: center;
     cursor: pointer;
+    z-index: 1;
+    top: 70px;
+    right: 3px;
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
 }
-.custom_zoomcontrol_plus span img {
-    width: 15px;
-    height: 15px;
-    padding: 12px 0;
-    border: none;
-}
-.custom_zoomcontrol_minus {
+#custom_zoomcontrol_minus {
     position: absolute;
-    top: 100px;
-    right: 7px;
-    width: 36px;
-    height: 40px;
-    overflow: hidden;
-    z-index: 1;
-    background-color: #f5f5f5;
-}
-.custom_zoomcontrol_minus span {
-    display: block;
-    width: 36px;
-    height: 40px;
-    text-align: center;
     cursor: pointer;
+    z-index: 1;
+    top: 130px;
+    right: 3px;
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
 }
-.custom_zoomcontrol_minus span img {
-    width: 15px;
-    height: 15px;
-    padding: 12px 0;
-    border: none;
-}
-.custom_zoomcontrol_plus:active {
+/* #custom_zoomcontrol_plus:active {
     background-color: rgb(102, 102, 102);
 }
-.custom_zoomcontrol_minus:active {
+#custom_zoomcontrol_minus:active {
     background-color: rgb(102, 102, 102);
-}
+} */
 #roadviewControl {
     position: absolute;
-    top: 150px;
-    right: 5px;
-    width: 42px;
-    height: 42px;
-    z-index: 1;
     cursor: pointer;
-    background: url("https://t1.daumcdn.net/localimg/localimages/07/2018/pc/common/img_search.png") 0 -450px no-repeat;
+    z-index: 1;
+    top: 190px;
+    right: 3px;
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.27);
+    border: solid 1px #c1c1c1;
+    background-color: #f67c7c;
 }
 #roadviewControl.active {
     background-position: 0 -350px;

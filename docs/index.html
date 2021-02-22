@@ -24,19 +24,34 @@
                     <span class="img"></span>
                 </div>
             </div>
-            <!-- 지도 위치를 초기화할 div 입니다-->
-            <div id="resetControl" onclick="reset()"></div>
+            <!-- 지도 위치를 초기화할 img 입니다-->
+            <img
+                src="./img/reset/group-12.png"
+                srcset="./img/reset/group-12@2x.png 2x, ./img/reset/group-12@3x.png 3x"
+                id="resetControl"
+                onclick="reset()">
             <!-- 지도를 표시할 div 입니다 -->
             <div id="mapWrapper">
                 <div id="kakaoMap" style="width:100%;height:100%"></div>
-                <div id="roadviewControl" onclick="setRoadviewRoad()"></div>
-                <!-- 지도 확대, 축소 컨트롤 div 입니다 -->
-                <div class="custom_zoomcontrol_plus radius_border"> 
-                    <span onclick="zoomIn()"><img src="https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/ico_plus.png" alt="확대"></span>
-                </div>
-                <div class="custom_zoomcontrol_minus radius_border">
-                    <span onclick="zoomOut()"><img src="https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/ico_minus.png" alt="축소"></span>
-                </div>
+                <img
+                    src="./img/roadview/rounded-rectangle-1-copy-3.png"
+                    srcset="./img/roadview/rounded-rectangle-1-copy-3@2x.png 2x,
+                    ./img/roadview/rounded-rectangle-1-copy-3@3x.png 3x"
+                    id="roadviewControl"
+                    onclick="setRoadviewRoad()">
+                <!-- 지도 확대, 축소 컨트롤 img 입니다 -->
+                <img
+                    src="./img/plus/group-11.png"
+                    srcset="./img/plus/group-11@2x.png 2x,
+                        ./img/plus/group-11@3x.png 3x"
+                    id="custom_zoomcontrol_plus"
+                    onclick="zoomIn()">
+                <img
+                    src="./img/minus/group-10.png"
+                    srcset="./img/minus/group-10@2x.png 2x,
+             ./img/minus/group-10@3x.png 3x"
+                    id="custom_zoomcontrol_minus"
+                    onclick="zoomOut()">
             </div>
         </div>
         <script>
@@ -76,9 +91,9 @@
             // console.log(getStr);
             let typeString = getStr.join('');
             // console.log(typeString);
-
             // 마지막으로 조회된 지도 위치 (로컬 스토리지를 이용)
-            let lat, lot;
+            let lat,
+                lot;
             if (!localStorage.getItem('lat') && !localStorage.getItem('lot')) {
                 lat = 37.565694;
                 lot = 126.977139;

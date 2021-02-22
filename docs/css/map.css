@@ -80,12 +80,6 @@
     height: 52px;
     object-fit: contain;
 }
-#resetControl .resetTooltip {
-    visibility: visible;
-}
-#resetControl:hover .resetTooltip {
-    visibility: visible;
-}
 #custom_zoomcontrol_plus {
     position: absolute;
     cursor: pointer;

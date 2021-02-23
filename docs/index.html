@@ -27,57 +27,57 @@
             <!-- 지도 위치를 초기화할 위젯 img 입니다-->
             <img
                 id="resetControl"
-                src="./img/reset/group-12.png"
-                srcset="./img/reset/group-12@2x.png 2x, ./img/reset/group-12@3x.png 3x"
+                src="./img/reset/group-3.png"
+                srcset="./img/reset/group-3@2x.png 2x, ./img/reset/group-3@3x.png 3x"
                 onclick="reset()">
             <!-- 초기화 위젯 툴팁 img 입니다-->
             <img
                 class="resetTooltip"
-                src="./img/reset_tooltip/group-6.png"
-                srcset="./img/reset_tooltip/group-6@2x.png 2x,
-                        ./img/reset_tooltip/group-6@3x.png 3x">
+                src="./img/reset/reset_tooltip/group-6.png"
+                srcset="./img/reset/reset_tooltip/group-6@2x.png 2x,
+                        ./img/reset/reset_tooltip/group-6@3x.png 3x">
             <!-- 지도를 표시할 div 입니다 -->
             <div id="mapWrapper">
                 <div id="kakaoMap" style="width:100%;height:100%"></div>
                 <!-- 지도 확대 컨트롤 위젯 img 입니다 -->
                 <img
                     id="custom_zoomcontrol_plus"
-                    src="./img/plus/group-11.png"
-                    srcset="./img/plus/group-11@2x.png 2x,
-                        ./img/plus/group-11@3x.png 3x"
+                    src="./img/plus/group-4.png"
+                    srcset="./img/plus/group-4@2x.png 2x,
+                        ./img/plus/group-4@3x.png 3x"
                     onclick="zoomIn()">
                 <!-- 확대 위젯 툴팁 img 입니다-->
                 <img
                     class="plusTooltip"
-                    src="./img/plus_tooltip/group-7.png"
-                    srcset="./img/plus_tooltip/group-7@2x.png 2x,
-                            ./img/plus_tooltip/group-7@3x.png 3x">
+                    src="./img/plus/plus_tooltip/group-7.png"
+                    srcset="./img/plus/plus_tooltip/group-7@2x.png 2x,
+                            ./img/plus/plus_tooltip/group-7@3x.png 3x">
                 <!-- 지도 축소 컨트롤 위젯 img 입니다 -->
                 <img
                     id="custom_zoomcontrol_minus"
-                    src="./img/minus/group-10.png"
-                    srcset="./img/minus/group-10@2x.png 2x,
-             ./img/minus/group-10@3x.png 3x"
+                    src="./img/minus/group-13.png"
+                    srcset="./img/minus/group-13@2x.png 2x,
+             ./img/minus/group-13@3x.png 3x"
                     onclick="zoomOut()">
                 <!-- 축소 위젯 툴팁 img 입니다-->
                 <img
                     class="minusTooltip"
-                    src="./img/minus_tooltip/group-8.png"
-                    srcset="./img/minus_tooltip/group-8@2x.png 2x,
-                            ./img/minus_tooltip/group-8@3x.png 3x">
+                    src="./img/minus/minus_tooltip/group-8.png"
+                    srcset="./img/minus/minus_tooltip/group-8@2x.png 2x,
+                            ./img/minus/minus_tooltip/group-8@3x.png 3x">
                 <!-- 로드뷰 전환 위젯 img 입니다-->
                 <img
                     id="roadviewControl"
-                    src="./img/roadview/rounded-rectangle-1-copy-3.png"
+                    src="./img/roadview/roadview.png"
                     srcset="./img/roadview/rounded-rectangle-1-copy-3@2x.png 2x,
                     ./img/roadview/rounded-rectangle-1-copy-3@3x.png 3x"
                     onclick="setRoadviewRoad()">
                 <!-- 로드뷰 위젯 툴팁 img 입니다-->
                 <img
                     class="roadviewTooltip"
-                    src="./img/roadview_tooltip/group-9.png"
-                    srcset="./img/roadview_tooltip/group-9@2x.png 2x,
-                            ./img/roadview_tooltip/group-9@3x.png 3x">
+                    src="./img/roadview/roadview_tooltip/group-9.png"
+                    srcset="./img/roadview/roadview_tooltip/group-9@2x.png 2x,
+                            ./img/roadview/roadview_tooltip/group-9@3x.png 3x">
             </div>
         </div>
         <script>
@@ -411,6 +411,13 @@
                                             .maps
                                             .LatLng(val.lat, val.lot)
                                     });
+                                var markerImage = new kakao
+                                    .maps
+                                    .MarkerImage(
+                                        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+                                        new kakao.maps.Size(31, 35)
+                                    );
+                                markers.setImage(markerImage);
                                 markers.setMap(map);
 
                                 let infowindow = new kakao

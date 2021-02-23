@@ -80,6 +80,9 @@
     height: 52px;
     object-fit: contain;
 }
+#resetControl:active {
+    content: url("../img/reset/resetOver/group-12.png");
+}
 .resetTooltip {
     visibility: hidden;
     position: absolute;
@@ -116,6 +119,9 @@
 #custom_zoomcontrol_plus:hover +.plusTooltip {
     visibility: visible;
 }
+#custom_zoomcontrol_plus:active {
+    content: url("../img/plus/plusOver/group-11.png");
+}
 #custom_zoomcontrol_minus {
     position: absolute;
     cursor: pointer;
@@ -139,29 +145,26 @@
 #custom_zoomcontrol_minus:hover +.minusTooltip {
     visibility: visible;
 }
-/* #custom_zoomcontrol_plus:active {
-    background-color: rgb(102, 102, 102);
-}
 #custom_zoomcontrol_minus:active {
-    background-color: rgb(102, 102, 102);
-} */
+    content: url("../img/minus/minusOver/group-10.png");
+}
 #roadviewControl {
     position: absolute;
     cursor: pointer;
     z-index: 1;
     top: 190px;
     right: 3px;
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
     object-fit: contain;
-    border-radius: 10px;
+    /* border-radius: 10px;
     box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.27);
     border: solid 1px #c1c1c1;
-    background-color: #f67c7c;
+    background-color: #f67c7c; */
 }
-/* #roadviewControl.active {
-    background-position: 0 -350px;
-} */
+#roadviewControl.active {
+    content: url("../img/roadview/roadviewOver/roadviewOver.png");
+}
 .roadviewTooltip {
     visibility: hidden;
     position: absolute;

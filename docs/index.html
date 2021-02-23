@@ -245,7 +245,10 @@
                                         val.center_lat, val.center_lot
                                     ],
                                     name: val.KOR_NM,
-                                    cd: val.CD
+                                    cd: val.CD,
+                                    color: val.color,
+                                    backgroundColor: val.backgroundColor,
+                                    guid: "https://foilemap.co.kr"+val.guid
                                 });
                                 getCD.push(val.CD);
                                 // console.log(coordinates);
@@ -283,7 +286,10 @@
                                         val.center_lat, val.center_lot
                                     ],
                                     name: val.KOR_NM,
-                                    cd: val.CD
+                                    cd: val.CD,
+                                    color: val.color,
+                                    backgroundColor: val.backgroundColor,
+                                    guid: "https://foilemap.co.kr"+val.guid
                                 });
                                 getCD.push(val.CD);
                                 // console.log(coordinates);
@@ -321,7 +327,10 @@
                                         val.center_lat, val.center_lot
                                     ],
                                     name: val.KOR_NM,
-                                    cd: val.CD
+                                    cd: val.CD,
+                                    color: val.color,
+                                    backgroundColor: val.backgroundColor,
+                                    guid: "https://foilemap.co.kr"+val.guid
                                 });
                                 getCD.push(val.CD);
                                 // console.log(coordinates);
@@ -487,10 +496,20 @@
                                         displayInfo(
                                             new kakao.maps.LatLng(val.center[0], val.center[1]),
                                             val.name,
-                                            result[cntIndex].cnt
+                                            result[cntIndex].cnt,
+                                            val.color,
+                                            val.backgroundColor,
+                                            val.guid
                                         );
                                     } else {
-                                        displayInfo(new kakao.maps.LatLng(val.center[0], val.center[1]), val.name, 0);
+                                        displayInfo(
+                                            new kakao.maps.LatLng(val.center[0], val.center[1]),
+                                            val.name,
+                                            0,
+                                            val.color,
+                                            val.backgroundColor,
+                                            val.guid
+                                        );
                                     }
                                 });
                             });
@@ -526,10 +545,20 @@
                                         displayInfo(
                                             new kakao.maps.LatLng(val.center[0], val.center[1]),
                                             val.name,
-                                            result[cntIndex].cnt
+                                            result[cntIndex].cnt,
+                                            val.color,
+                                            val.backgroundColor,
+                                            val.guid
                                         );
                                     } else {
-                                        displayInfo(new kakao.maps.LatLng(val.center[0], val.center[1]), val.name, 0);
+                                        displayInfo(
+                                            new kakao.maps.LatLng(val.center[0], val.center[1]),
+                                            val.name,
+                                            0,
+                                            val.color,
+                                            val.backgroundColor,
+                                            val.guid
+                                        );
                                     }
                                 });
                             });
@@ -564,10 +593,20 @@
                                         displayInfo(
                                             new kakao.maps.LatLng(val.center[0], val.center[1]),
                                             val.name,
-                                            result[cntIndex].cnt
+                                            result[cntIndex].cnt,
+                                            val.color,
+                                            val.backgroundColor,
+                                            val.guid
                                         );
                                     } else {
-                                        displayInfo(new kakao.maps.LatLng(val.center[0], val.center[1]), val.name, 0);
+                                        displayInfo(
+                                            new kakao.maps.LatLng(val.center[0], val.center[1]),
+                                            val.name,
+                                            0,
+                                            val.color,
+                                            val.backgroundColor,
+                                            val.guid
+                                        );
                                     }
                                 });
                             });
@@ -576,7 +615,7 @@
             }
 
             // 행정구역 UI 렌더링 함수
-            function displayInfo(center, name, cnt) {
+            function displayInfo(center, name, cnt, color, backgroundColor, guid) {
                 // console.log(center, name, cnt);
                 let customOverlay = new kakao
                     .maps
@@ -584,6 +623,9 @@
 
                 let content = document.createElement('div');
                 content.className = 'area';
+                content.style.backgroundImage = "url("+guid+")";
+                content.style.color = color;
+                content.style.backgroundColor = backgroundColor;
                 content.innerHTML = '<span class="name">' + name +
                         '</span><span class="cnt">' + cnt + '개</span></div>';
                 // console.log(content);

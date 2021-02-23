@@ -1,25 +1,18 @@
 .area {
-    background-color: #4056e7;
-    display: inline-block;
-    box-sizing: border-box;
-    width: 120%;
-    border-radius: 26px;
-    opacity: 1;
-    position: relative;
     cursor: pointer;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 .area .name {
     text-align: center;
-    font-size: 13px;
-    padding: 3px;
-    color: yellow;
+    font-size: 0.7em;
+    /* padding: 13px; */
 }
 .area .cnt {
     text-align: center;
-    font-size: 14px;
+    font-size: 1em;
     font-weight: bold;
-    padding: 3px;
-    color: white;
+    /* padding: 3px; */
 }
 .area span {
     display: block;

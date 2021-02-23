@@ -248,7 +248,7 @@
                                     cd: val.CD,
                                     color: val.color,
                                     backgroundColor: val.backgroundColor,
-                                    guid: "https://foilemap.co.kr"+val.guid
+                                    guid: "https://foilemap.co.kr" + val.guid
                                 });
                                 getCD.push(val.CD);
                                 // console.log(coordinates);
@@ -289,7 +289,7 @@
                                     cd: val.CD,
                                     color: val.color,
                                     backgroundColor: val.backgroundColor,
-                                    guid: "https://foilemap.co.kr"+val.guid
+                                    guid: "https://foilemap.co.kr" + val.guid
                                 });
                                 getCD.push(val.CD);
                                 // console.log(coordinates);
@@ -330,7 +330,7 @@
                                     cd: val.CD,
                                     color: val.color,
                                     backgroundColor: val.backgroundColor,
-                                    guid: "https://foilemap.co.kr"+val.guid
+                                    guid: "https://foilemap.co.kr" + val.guid
                                 });
                                 getCD.push(val.CD);
                                 // console.log(coordinates);
@@ -623,11 +623,11 @@
 
                 let content = document.createElement('div');
                 content.className = 'area';
-                content.style.backgroundImage = "url("+guid+")";
+                content.style.backgroundImage = "url(" + guid + ")";
                 content.style.color = color;
                 content.style.backgroundColor = backgroundColor;
-                content.innerHTML = '<span class="name">' + name +
-                        '</span><span class="cnt">' + cnt + '개</span></div>';
+                content.innerHTML = '<div class="name">' + name +
+                        '</div><div class="cnt">' + cnt + '개</div></div>';
                 // console.log(content);
                 customOverlay.setContent(content);
                 customOverlay.setPosition(center);

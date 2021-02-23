@@ -1,4 +1,6 @@
 .area {
+    width: 60px;
+    height: 70px;
     cursor: pointer;
     background-repeat: no-repeat;
     background-size: contain;
@@ -6,16 +8,12 @@
 .area .name {
     text-align: center;
     font-size: 0.7em;
-    /* padding: 13px; */
 }
 .area .cnt {
     text-align: center;
     font-size: 1em;
     font-weight: bold;
-    /* padding: 3px; */
-}
-.area span {
-    display: block;
+    padding-top: 10px;
 }
 @media (max-width: 1199px) {
     #container {

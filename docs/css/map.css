@@ -72,7 +72,7 @@
     object-fit: contain;
 }
 #resetControl:active {
-    content: url("../img/reset/resetOver/group-12.png");
+    content: url("../img/reset/resetOver/resetOver.png");
 }
 .resetTooltip {
     visibility: hidden;

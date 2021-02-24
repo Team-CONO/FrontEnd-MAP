@@ -25,10 +25,7 @@
                 </div>
             </div>
             <!-- 지도 위치를 초기화할 위젯 img 입니다-->
-            <img
-                id="resetControl"
-                src="./img/reset/reset.png"
-                onclick="reset()">
+            <img id="resetControl" src="./img/reset/reset.png" onclick="reset()">
             <!-- 초기화 위젯 툴팁 img 입니다-->
             <img
                 class="resetTooltip"
@@ -386,7 +383,8 @@
 
             // 행정구역 매물 관련 괸리자 페이지 API 'forsale' 호출 함수
             function mapCnt(getCD, getData) {
-                // console.log(getCD, getData); 파라미터 값이 없을 경우 즉 현재 지도 줌 레벨이 거리 단위임을 뜻 함
+                // console.log(getCD, getData); 
+                // 파라미터 값이 없을 경우 즉 현재 지도 줌 레벨이 거리 단위임을 뜻 함
                 if (getCD === undefined && getData === undefined) {
                     $
                         .ajax({
@@ -407,9 +405,13 @@
                             }
                         })
                         .done(function (params) {
-                            // console.log(params); 마커 하나 당 인포 윈도우와 클릭 시 해당 메물 페이지로 이동
+                            // console.log(params); 
+                            // 매물 하나 당 인포 윈도우와 클릭 시 해당 메물 페이지로 이동
                             $.each(params.data, function (index, val) {
-                                // console.log(val, index);
+                                console.log(val, index);
+                                let customOverlay = new kakao
+                                    .maps
+                                    .CustomOverlay({}); // 해당 매물 관련 UI를 표시할 오버레이
                                 let markers = new kakao
                                     .maps
                                     .Marker({
@@ -625,8 +627,8 @@
                 content.style.backgroundImage = "url(" + guid + ")";
                 content.style.color = color;
                 content.style.backgroundColor = backgroundColor;
-                content.innerHTML = '<div class="name">' + name +
-                        '</div><div class="cnt">' + cnt + '개</div></div>';
+                content.innerHTML = '<div class="name">' + name + '</div><div class="cnt">' +
+                        cnt + '개</div></div>';
                 // console.log(content);
                 customOverlay.setContent(content);
                 customOverlay.setPosition(center);
@@ -670,10 +672,12 @@
             // 마커의 인포윈도우를 클릭하는 클로저를 만드는 함수
             function makeClickListener(cafe24idx) {
                 return function () {
-                    window.open(
-                        "http://www.folie.co.kr/bizdemo87846/goods/goods_2.php?type=recomm&mode=view&id" +
-                        "x=" + cafe24idx
-                    );
+                    window
+                        .location
+                        .replace(
+                            "http://www.folie.co.kr/bizdemo87846/goods/goods_2.php?type=recomm&mode=view&id" +
+                            "x=" + cafe24idx
+                        );
                     // console.log('클릭된 매물 정보는 : ', cafe24idx);
                 }
             }

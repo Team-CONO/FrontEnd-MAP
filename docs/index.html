@@ -408,57 +408,35 @@
                             // console.log(params); 
                             // 매물 하나 당 인포 윈도우와 클릭 시 해당 메물 페이지로 이동
                             $.each(params.data, function (index, val) {
-                                console.log(val, index);
+                                // console.log(val, index);
                                 let customOverlay = new kakao
                                     .maps
                                     .CustomOverlay({}); // 해당 매물 관련 UI를 표시할 오버레이
-                                let markers = new kakao
-                                    .maps
-                                    .Marker({
-                                        position: new kakao
-                                            .maps
-                                            .LatLng(val.lat, val.lot)
-                                    });
-                                var markerImage = new kakao
-                                    .maps
-                                    .MarkerImage(
-                                        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
-                                        new kakao.maps.Size(31, 35)
-                                    );
-                                markers.setImage(markerImage);
-                                markers.setMap(map);
 
-                                let infowindow = new kakao
-                                    .maps
-                                    .InfoWindow({
-                                        content: val.houseName // 인포윈도우에 표시할 내용
-                                    });
-                                // 다양한 마커 관련 마우스 이벤트 함수 클로저
-                                kakao
-                                    .maps
-                                    .event
-                                    .addListener(markers, 'mouseover', makeOverListener(map, markers, infowindow));
-                                kakao
-                                    .maps
-                                    .event
-                                    .addListener(markers, 'mouseout', makeOutListener(infowindow));
-                                kakao
-                                    .maps
-                                    .event
-                                    .addListener(markers, 'click', makeClickListener(val.cafe24IDX));
+                                let content = document.createElement('div');
+                                content.className = 'marker';
+                                content.style.backgroundImage = "url( https://foilemap.co.kr" + val.ht_guid +
+                                        ")";
+                                content.style.color = val.ht_color;
+                                content.style.backgroundColor = val.ht_bgColor;
+                                // console.log(content);
+                                customOverlay.setContent(content);
+                                customOverlay.setPosition(new kakao.maps.LatLng(val.lat, val.lot));
+                                customOverlay.setMap(map);
+                                addEventHandle(content, 'click', ClickUI(val.cafe24IDX));
 
                                 // 지도에 줌, 드래그 이벤트 시 기존 마커는 제거
                                 kakao
                                     .maps
                                     .event
                                     .addListener(map, 'zoom_changed', function () {
-                                        markers.setMap(null);
+                                        customOverlay.setMap(null);
                                     });
                                 kakao
                                     .maps
                                     .event
                                     .addListener(map, 'dragend', function () {
-                                        markers.setMap(null);
+                                        customOverlay.setMap(null);
                                     });
                             });
 
@@ -657,31 +635,6 @@
                 }
             }
 
-            // 마커의 인포윈도우를 표시하는 클로저를 만드는 함수입니다
-            function makeOverListener(map, marker, infowindow) {
-                return function () {
-                    infowindow.open(map, marker);
-                };
-            }
-            // 마커의 인포윈도우를 닫는 클로저를 만드는 함수입니다
-            function makeOutListener(infowindow) {
-                return function () {
-                    infowindow.close();
-                };
-            }
-            // 마커의 인포윈도우를 클릭하는 클로저를 만드는 함수
-            function makeClickListener(cafe24idx) {
-                return function () {
-                    window
-                        .location
-                        .replace(
-                            "http://www.folie.co.kr/bizdemo87846/goods/goods_2.php?type=recomm&mode=view&id" +
-                            "x=" + cafe24idx
-                        );
-                    // console.log('클릭된 매물 정보는 : ', cafe24idx);
-                }
-            }
-
             // 행정구역 UI를 클릭 했을 때 호출되는 핸들러 입니다
             function onMouseClick(center) {
                 return function () {
@@ -694,6 +647,14 @@
                     });
                     deletePolygon(polygons);
                 };
+            }
+            // 매물 UI를 클릭 했을 때 호출되는 핸들러 입니다
+            function ClickUI(cafe24idx) {
+                return function () {
+                    window.location.href = "http://www.folie.co.kr/bizdemo87846/goods/goods_2.php?type=recomm&mode=view&id" +
+                            "x=" + cafe24idx;
+                    // console.log('클릭된 매물 정보는 : ', cafe24idx);
+                }
             }
             // target node에 이벤트 핸들러를 등록하는 함수힙니다
             function addEventHandle(target, type, callback) {

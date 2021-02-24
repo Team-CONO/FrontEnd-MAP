@@ -110,7 +110,8 @@
             });
             // console.log(getStr);
             let typeString = getStr.join('');
-            // console.log(typeString); 마지막으로 조회된 지도 위치 (로컬 스토리지를 이용)
+            // console.log(typeString); 
+            // 마지막으로 조회된 지도 위치 (로컬 스토리지를 이용)
             let lat,
                 lot;
             if (!localStorage.getItem('lat') && !localStorage.getItem('lot')) {
@@ -383,7 +384,8 @@
 
             // 행정구역 매물 관련 괸리자 페이지 API 'forsale' 호출 함수
             function mapCnt(getCD, getData) {
-                // console.log(getCD, getData); 파라미터 값이 없을 경우 즉 현재 지도 줌 레벨이 거리 단위임을 뜻 함
+                // console.log(getCD, getData); 
+                // 파라미터 값이 없을 경우 즉 현재 지도 줌 레벨이 거리 단위임을 뜻 함
                 if (getCD === undefined && getData === undefined) {
                     $
                         .ajax({
@@ -404,7 +406,8 @@
                             }
                         })
                         .done(function (params) {
-                            // console.log(params); 매물 하나 당 인포 윈도우와 클릭 시 해당 메물 페이지로 이동
+                            // console.log(params); 
+                            // 매물 하나 당 UI 렌더링 및 클릭 시 해당 메물 페이지로 이동
                             $.each(params.data, function (index, val) {
                                 // console.log(val, index);
                                 let customOverlay = new kakao
@@ -442,7 +445,6 @@
                                         customOverlay.setMap(null);
                                     });
                             });
-
                         });
                 } else {
                     let CDstring = getCD.join(','); // CD 배열을 문자열로 변환

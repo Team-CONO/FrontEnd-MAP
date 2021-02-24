@@ -419,6 +419,8 @@
                                         ")";
                                 content.style.color = val.ht_color;
                                 content.style.backgroundColor = val.ht_bgColor;
+                                content.innerHTML = '<div class="name">' + val.houseType + '</div><div class="cnt">' +
+                                        val.adminMemo || val.houseName + '</div></div>';
                                 // console.log(content);
                                 customOverlay.setContent(content);
                                 customOverlay.setPosition(new kakao.maps.LatLng(val.lat, val.lot));

@@ -111,7 +111,8 @@
             // console.log(getStr);
             let typeString = getStr.join('');
             // console.log(typeString); 
-            // 마지막으로 조회된 지도 위치 (로컬 스토리지를 이용)
+
+            //마지막으로 조회된 지도 위치 (로컬 스토리지 이용)
             let lat,
                 lot;
             if (!localStorage.getItem('lat') && !localStorage.getItem('lot')) {
@@ -122,6 +123,14 @@
                 lot = localStorage.getItem('lot');
             }
 
+            // 마지막으로 조회된 지도 줌 레벨 값 (로컬 스토리지 이용)
+            let mapLevel;
+            if (!localStorage.getItem('level')) {
+                mapLevel = 10;
+            } else {
+                mapLevel = localStorage.getItem('level');
+            }
+
             let map = new kakao
                 .maps
                 .Map(document.getElementById('kakaoMap'), {
@@ -129,7 +138,7 @@
                     center: new kakao
                         .maps
                         .LatLng(lat, lot), // 초기 지도의 중심좌표
-                    level: 10, // 초기 지도의 확대 레벨
+                    level: mapLevel, // 초기 지도의 확대 레벨
                     disableDoubleClickZoom: true, // 지도에 더블클릭 방지
                 });
             console.log("초기 지도 줌 레벨 값은 :", map.getLevel());
@@ -141,16 +150,29 @@
             let mapCenter = map.getCenter();
             // 지도의 타입 변수
             let mapType;
-            // 지도의 줌 레벨 변수
-            let mapLevel;
             let overlayOn = false, // 지도 위에 로드뷰 오버레이가 추가된 상태를 가지고 있을 변수
                 container = document.getElementById('container'), // 지도와 로드뷰를 감싸고 있는 div 입니다
                 mapWrapper = document.getElementById('mapWrapper'), // 지도를 감싸고 있는 div 입니다
                 mapContainer = document.getElementById('map'), // 지도를 표시할 div 입니다
                 rvContainer = document.getElementById('roadview'); //로드뷰를 표시할 div 입니다
 
-            // 초기 지도는 화면 중심으로 시도 단위로 폴리곤 렌더링
-            mapUnit(mapCenter, 'ctp');
+            // 초기 지도 줌 레벨 값에 따른 폴리곤 렌더링
+            if (mapLevel >= 10) {
+                // deletePolygon(polygons);
+                mapUnit(mapCenter, 'ctp');
+            }
+            if (mapLevel >= 8 && mapLevel < 10) {
+                // deletePolygon(polygons);
+                mapUnit(mapCenter, 'sig');
+            }
+            if (mapLevel >= 6 && mapLevel < 8) {
+                // deletePolygon(polygons);
+                mapUnit(mapCenter, 'emd');
+            }
+            if (mapLevel <= 4) {
+                // deletePolygon(polygons);
+                mapCnt();
+            }
 
             // 지도에 줌 이벤트가 발생하였을 때
             kakao
@@ -165,6 +187,7 @@
                     // 마지막 위치 값 저장
                     localStorage.setItem('lat', mapCenter.getLat());
                     localStorage.setItem('lot', mapCenter.getLng());
+                    localStorage.setItem('level', mapLevel);
 
                     // 레벨이 10 이상인 경우 시도 단위로 폴리곤 렌더링
                     if (mapLevel >= 10) {
@@ -198,6 +221,7 @@
                     // 마지막 위치 값 저장
                     localStorage.setItem('lat', mapCenter.getLat());
                     localStorage.setItem('lot', mapCenter.getLng());
+                    localStorage.setItem('level', mapLevel);
 
                     // 드래그 이벤트로 인한 새로운 지도 모습에 중심좌표를 기점으로 새 폴리곤 및 UI 렌더링
                     if (mapLevel > 4) {

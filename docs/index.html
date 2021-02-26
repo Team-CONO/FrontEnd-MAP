@@ -158,19 +158,15 @@
 
             // 초기 지도 줌 레벨 값에 따른 폴리곤 렌더링
             if (mapLevel >= 10) {
-                // deletePolygon(polygons);
                 mapUnit(mapCenter, 'ctp');
             }
             if (mapLevel >= 8 && mapLevel < 10) {
-                // deletePolygon(polygons);
                 mapUnit(mapCenter, 'sig');
             }
             if (mapLevel >= 6 && mapLevel < 8) {
-                // deletePolygon(polygons);
                 mapUnit(mapCenter, 'emd');
             }
             if (mapLevel <= 4) {
-                // deletePolygon(polygons);
                 mapCnt();
             }
 
@@ -187,6 +183,7 @@
                     // 마지막 위치 값 저장
                     localStorage.setItem('lat', mapCenter.getLat());
                     localStorage.setItem('lot', mapCenter.getLng());
+                    // 마지막 줌 값 저장
                     localStorage.setItem('level', mapLevel);
 
                     // 레벨이 10 이상인 경우 시도 단위로 폴리곤 렌더링
@@ -221,6 +218,7 @@
                     // 마지막 위치 값 저장
                     localStorage.setItem('lat', mapCenter.getLat());
                     localStorage.setItem('lot', mapCenter.getLng());
+                    // 마지막 줌 값 저장
                     localStorage.setItem('level', mapLevel);
 
                     // 드래그 이벤트로 인한 새로운 지도 모습에 중심좌표를 기점으로 새 폴리곤 및 UI 렌더링

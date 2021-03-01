@@ -24,17 +24,17 @@
                     <span class="img"></span>
                 </div>
             </div>
-            <!-- 지도 위치를 초기화할 위젯 img 입니다-->
-            <img id="resetControl" src="./img/reset/reset.png" onclick="reset()">
-            <!-- 초기화 위젯 툴팁 img 입니다-->
-            <img
-                class="resetTooltip"
-                src="./img/reset/reset_tooltip/group-6.png"
-                srcset="./img/reset/reset_tooltip/group-6@2x.png 2x,
-                        ./img/reset/reset_tooltip/group-6@3x.png 3x">
             <!-- 지도를 표시할 div 입니다 -->
             <div id="mapWrapper">
                 <div id="kakaoMap" style="width:100%;height:100%"></div>
+                <!-- 지도 위치를 초기화할 위젯 img 입니다-->
+                <img id="resetControl" src="./img/reset/reset.png" onclick="reset()">
+                <!-- 초기화 위젯 툴팁 img 입니다-->
+                <img
+                    class="resetTooltip"
+                    src="./img/reset/reset_tooltip/group-6.png"
+                    srcset="./img/reset/reset_tooltip/group-6@2x.png 2x,
+                        ./img/reset/reset_tooltip/group-6@3x.png 3x">
                 <!-- 지도 확대 컨트롤 위젯 img 입니다 -->
                 <img
                     id="custom_zoomcontrol_plus"
@@ -111,8 +111,7 @@
             // console.log(getStr);
             let typeString = getStr.join('');
             // console.log(typeString); 
-
-            //마지막으로 조회된 지도 위치 (로컬 스토리지 이용)
+            // 마지막으로 조회된 지도 위치 (로컬 스토리지 이용)
             let lat,
                 lot;
             if (!localStorage.getItem('lat') && !localStorage.getItem('lot')) {
@@ -665,7 +664,7 @@
             // 행정구역 UI를 클릭 했을 때 호출되는 핸들러 입니다
             function onMouseClick(center) {
                 return function () {
-                    // console.log('click'); UI 클릭 시 지도 줌 이벤트 활성
+                    // UI 클릭 시 지도 줌 이벤트 활성
                     map.setLevel(map.getLevel() - 2, {
                         anchor: center,
                         animate: {
